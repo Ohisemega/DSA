@@ -5,7 +5,7 @@
 int solution(std::vector< std::vector<int> > &a){
 	const int rowNum = a.size();
 	const int columnNum = a[0].size();
-	std::vector<int> rowSums[rowNum];
+	std::vector<int> rowSums(rowNum);
 	std::vector<int> columnSums(columnNum);
 	int equRows = 0;
 	int equColumns = 0;
