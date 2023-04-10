@@ -33,7 +33,7 @@ int solution(std::vector< std::vector<int> > &a){
 
 	//compare the stack top and sum value to determine equilibrum rows
 	sum = 0;
-	for(int i = rowNum - 1; i >= 0; --i, sum += rowSums[i]){
+	for(int i = rowNum - 1, sum = rowSums[i]; i >= 0; --i, sum += rowSums[i]){
 		if(stackSum.top() == sum){
 			++equRows;
 		}
@@ -50,7 +50,7 @@ int solution(std::vector< std::vector<int> > &a){
 
 	//compare the stack top and sum value to determine equilibrum columns
 	sum = 0;
-	for(int i = columnNum - 1; i >= 0; --i, sum += columnSums[i]){
+	for(int i = columnNum - 1, sum = columnSums[i]; i >= 0; --i, sum += columnSums[i]){
 		if(stackSum.top() == sum){
 			++equColumns;
 		}
