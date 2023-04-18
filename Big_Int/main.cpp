@@ -3,8 +3,8 @@
 
 int main(){
 	// BigInt first{670934567123285674};
-	// BigInt first{670934565932085674};
-	// BigInt Second{"999991246847291833423732543257755993030347457483302213845684874838374744491223344"};
+	BigInt first1{670934565932085674};
+	BigInt Second2{"999991246847291833423732543257755993030347457483302213845684874838374744491223344"};
 
 	BigInt first{200};
 	BigInt Second{"800"};
@@ -33,7 +33,7 @@ int main(){
 	// std::cout << "First is: "; first.print();
 	// long long third = a * b;
 	// std::cout << "This is the original leading zeroes count of first: " << first.ch << std::endl;
-	BigInt temp = first + Second;
+	BigInt temp = first1 * Second2;
 	// std::cout << "This is the current leading zeroes count of first: " << first.leadingZeroes << std::endl;
 	BigInt two{3447585940030339};
 	std::cout << "This is the now temp: " << std::endl;

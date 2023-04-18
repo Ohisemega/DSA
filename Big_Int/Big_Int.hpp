@@ -73,7 +73,7 @@ class BigInt{
 		}
 
 		//print operation
-		// void print()const;
+		void print()const;
 	private:
 		static const int digits = 1000;
 		std::array<short, digits>integers{};

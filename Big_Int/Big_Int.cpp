@@ -1,4 +1,5 @@
 #include "Big_Int.hpp"
+#include <iostream>
 #include <cctype>
 #include <stdexcept>
 
@@ -164,13 +165,13 @@ std::ostream& operator<<(std::ostream& output, const BigInt& bigInt){
 	return output;
 }
 
-// void BigInt::print() const{
-// 	for (int i = this->checkLeadingZeroes(); i < digits; ++i)
-// 	{
-// 		std::cout << (*this)[i];
-// 	}
-// 	std::cout <<std::endl;
-// }
+void BigInt::print() const{
+	for (int i = this->checkLeadingZeroes(); i < digits; ++i)
+	{
+		std::cout << (*this)[i];
+	}
+	std::cout <<std::endl;
+}
 
 short& BigInt::operator[](int subscript){
 	if(subscript < 0 || subscript >= digits) throw std::out_of_range{"Subscript out of range1"};
