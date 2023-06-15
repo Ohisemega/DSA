@@ -1,5 +1,12 @@
 #include "Big_Int.hpp"
+#include <utility>
 #include <iostream>
+
+void dummyFunc(BigInt&& b){
+	std::cout << "This is a test to see how the move semantics constructor works" << std::endl;
+	BigInt&& Concrete  = std::move(b);
+	Concrete.print();
+}
 
 int main(){
 	// BigInt first{670934567123285674};
@@ -23,9 +30,9 @@ int main(){
 	// long long b = 7491223344;
 	// BigInt first{2};
 	// BigInt Second{"1"};
-	first.print();
+	first1.print();
 	std::cout << std::endl;
-	Second.print();
+	Second2.print();
 
 
 	// BigInt fourth{99999999999};
@@ -33,17 +40,22 @@ int main(){
 	// std::cout << "First is: "; first.print();
 	// long long third = a * b;
 	// std::cout << "This is the original leading zeroes count of first: " << first.ch << std::endl;
+	BigInt multResult{first1 * Second2};
+	multResult.print();
+	std::cout << "Hey This is the now temp: " << std::endl;
 	BigInt temp = first1 * Second2;
-	// std::cout << "This is the current leading zeroes count of first: " << first.leadingZeroes << std::endl;
-	BigInt two{3447585940030339};
 	std::cout << "This is the now temp: " << std::endl;
 	temp.print();
+	// std::cout << "This is the current leading zeroes count of first: " << first.leadingZeroes << std::endl;
+	BigInt two{3447585940030339};
+	dummyFunc(BigInt(0));
 	BigInt third{two};
 	third += temp;
-	BigInt fourth = third - BigInt{1};
+	BigInt fourth = third - BigInt(1);
 	++third;
 	std::cout << "This is third: ";
 	third.print();
 	std::cout << "This is fourth: ";
 	fourth.print();
+	BigInt(1).print();
 }

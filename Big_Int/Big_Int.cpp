@@ -1,12 +1,23 @@
 #include "Big_Int.hpp"
 #include <iostream>
+#include <utility>
+#include <algorithm>
 #include <cctype>
 #include <stdexcept>
 
+
 BigInt::BigInt(const BigInt& copy){//copy constructor
+	// performs a deep copy
+	std::cout << "Calling the copy constructor for a deep copy" << "\n";
 	for (int i = digits-1; i >= copy.checkLeadingZeroes(); --i){
 		this->integers[i] = copy[i];
 	}
+}
+
+
+BigInt::BigInt(BigInt&& moveObj) noexcept{//move constructor
+	std::cout << "Calling the move constructor for a swap" << "\n";
+	*this = std::move(moveObj);
 }
 
 BigInt::BigInt(unsigned long long int val){
@@ -17,6 +28,11 @@ BigInt::BigInt(unsigned long long int val){
 		val = val/10;
 	}
 	if(i <= 0 && val != 0) throw std::invalid_argument("The value provided is too large!");
+}
+
+void BigInt::swap(BigInt& other) noexcept{
+	using std::swap;
+	swap(this->integers, other.integers);
 }
 
 BigInt::BigInt(const std::string& numberStr){
@@ -35,13 +51,23 @@ BigInt::BigInt(const std::string& numberStr){
 	}
 }
 
-BigInt& BigInt::operator=(const BigInt& right){
-	for (int i = digits-1; i >= right.checkLeadingZeroes(); --i){
-		this->integers[i] = right[i];
+BigInt& BigInt::operator=(const BigInt& copy){// Assignment operator
+	// performs a deep copy
+	std::cout << "Calling the operator constructor for a deep copy" << "\n";
+	for (int i = digits-1; i >= copy.checkLeadingZeroes(); --i){
+		this->integers[i] = copy[i];
 	}
-	return *this;
 }
 
+// BigInt& BigInt::operator=(BigInt copy){
+// 	swap(copy);
+// 	return *this;
+// }
+
+// BigInt& BigInt::operator=(BigInt&& right) noexcept{
+// 	swap(right);
+// 	return *this;
+// }
 
 BigInt BigInt::operator+(const BigInt& right) const{
 	int val, i, carry = 0;
@@ -71,6 +97,43 @@ BigInt BigInt::operator-(const BigInt& right) const{
 		}
 		ret.integers[i] = val;
 	}
+	return ret;
+}
+
+BigInt& BigInt::operator+=(const BigInt& right){
+	*this = *this + right;
+	return *this;
+}
+
+BigInt& BigInt::operator-=(const BigInt& right){
+	*this = *this - right;
+	return *this;
+}
+
+BigInt& BigInt::operator++(){
+	// BigInt temp{1};
+	*this = *this + BigInt(1);
+	return *this;
+}
+
+BigInt& BigInt::operator--(){
+	// BigInt temp{1};
+	this->integers[digits-1] = this->integers[digits-1] - 1;
+	// *this = *this - BigInt(1);
+	return *this;
+}
+
+BigInt BigInt::operator++(int){
+	BigInt ret{*this};
+	// BigInt temp{1};
+	*this = *this + BigInt(1);
+	return ret;
+}
+
+BigInt BigInt::operator--(int){
+	BigInt ret{*this};
+	// BigInt temp{1};
+	this->integers[digits-1] = this->integers[digits-1] - 1;
 	return ret;
 }
 
@@ -114,6 +177,11 @@ BigInt BigInt::operator*(const BigInt& right) const{
 	return ret;
 }
 
+BigInt& BigInt::operator*=(const BigInt& right){
+	(*this) = (*this) * right;
+	return *this;
+}
+
 bool BigInt::isZero() const{
 	for(int i = digits - 1, j = 0; i > j; --i, ++j){
 		if(this->integers[i] != 0 || this->integers[j] != 0){
@@ -151,6 +219,17 @@ bool BigInt::operator>(const BigInt& right) const{
 	return val;
 }
 
+bool BigInt::operator<(const BigInt& right) const{
+	return !(*this > right);
+}
+
+bool BigInt::operator>=(const BigInt& right) const{
+	return (*this > right || *this == right) ;
+}
+
+bool BigInt::operator!=(const BigInt& right) const{
+	return !(*this == right);
+}
 
 size_t BigInt::checkLeadingZeroes() const{
 	for(int i = 0; i < digits; ++i){
