@@ -5,6 +5,11 @@
 #include <cctype>
 #include <stdexcept>
 
+BigInt::BigInt(){
+	for(int i = 0; i < digits; ++i){
+		this->integers[i] = 0;
+	}
+}
 
 BigInt::BigInt(const BigInt& copy){//copy constructor
 	// performs a deep copy

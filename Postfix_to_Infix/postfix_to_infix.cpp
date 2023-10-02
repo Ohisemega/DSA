@@ -4,10 +4,10 @@
 
 std::string postfixToInfix(std::string& postfixExp){
 	int len = postfixExp.length();
-	std::string output = "";
+	// std::string output = "";
 	std::stack<std::string> stk;
 	std::string sum;
-	for(int i = 0; i < len; ++i){
+	for(int i = 0; i < len; ++i) {
 		if(postfixExp[i] == '-' && isdigit(postfixExp[i+1])){
 			++i;
 			std::string negVal = std::string() + "(" + "-" + postfixExp[i] + ")";

@@ -7,7 +7,7 @@
 class BigInt{
 	friend std::ostream& operator<<(std::ostream&, const BigInt&);
 	public:
-		// BigInt() = default;
+		BigInt() =delete;		
 		BigInt(const BigInt&);
 		BigInt(unsigned long long int = 0);
 		BigInt(const std::string&);//conversion constructor
