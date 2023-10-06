@@ -4,45 +4,59 @@
 #include <ctime>
 #include <cmath>
 
-template <typename T>
-Point<T>::Point(){
+template <typename T, int8_t dim>
+Point<T, dim>::Point() {
     std::srand(std::time(0));
-    this->_x = std::rand()/RAND_MAX * 2000000000.00;
-    this->_y = std::rand()/RAND_MAX * 2000000000.00;
+    for (int8_t i = 0; i < dim; ++i){
+        this->coords[i] = std::rand()/RAND_MAX * 2000000.00;
+    }
 }
 
-template <typename T>
-Point<T>::Point(T x, T y) : _x{x}, _y{y}{
-
+template <typename T, int8_t dim>
+Point<T, dim>::Point(T newCoords[dim]) {
+    for(int8_t i = 0; i < dim; ++i){
+        this->coords[i] = newCoords[i];
+    }
 }
 
-template <typename T>
-T Point<T>::getX() const{
-    return this->_x;
+template <typename T, int8_t dim>
+T Point<T, dim>::operator[](int8_t dimCoord) const{
+    return this->coords[dimCoord];
 }
 
-template <typename T>
-T Point<T>::getY() const{
-    return this->_y;
+template <typename T, int8_t dim>
+T& Point<T, dim>::operator[](int8_t dimCoord) {
+    return this->coords[dimCoord];
 }
 
-template <typename T>
-T Point<T>::distanceToOrigin() const{
-    return std::sqrt(std::pow(this->_x, 2) + std::pow(this->y, 2));
+template <typename T, int8_t dim>
+T Point<T, dim>::distanceToOrigin() const {
+    T sqrSum = 0;
+    for(int8_t i = 0; i < dim; ++i){
+        sqrSum += this->coord[i]*this->coords[i];
+    }
+    return std::sqrt(static_cast<float>(sqrSum));
 }
 
-template <typename T>
-T Point<T>::distanceFromPoint(Point& next) const{
-    return std::sqrt(std::pow(this->_x - next._x, 2) + std::pow(this->y - next._y, 2));
+template <typename T, int8_t dim>
+T Point<T, dim>::distanceFromPoint(Point& next) const {
+    T sqrSum = 0;
+    for(int8_t i = 0; i < dim; ++i){
+        sqrSum += (this->coord[i]*this->coords[i]) - (next[i]*next[i]);
+    }
+    return std::sqrt(static_cast<float>(sqrSum));
 }
 
-template <typename T>
-bool Point<T>::operator==(Point& p2) const{
-    return (this->distanceFromPoint(p2) < 0.000001);
+template <typename T, int8_t dim>
+bool Point<T, dim>::operator==(Point& p2) const {
+    return (static_cast<float>(this->distanceFromPoint(p2) < 0.000001));
 }
-template <typename T>
-std::ostream& operator<<(std::ostream& output, const Point<T> &p) {
-    output << "x: " << p._x << "y: " << p._y << "\n";
 
+template <typename T, int8_t dim>
+std::ostream& operator<<(std::ostream& output, const Point<T, dim> &p) {
+    for(int8_t i = 0; i < dim; ++i){
+        output << "dim[" << i << "]" << p[i] << " ";
+    }
+    output << "\n";
     return output;
 }

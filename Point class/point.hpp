@@ -2,21 +2,21 @@
 #define POINT_HPP
 
 #include <string>
-template <typename dataT>
+template <typename dataT, int8_t dim>
 class Point{
     template <typename T>
-    friend std::ostream& operator<<(std::ostream& out, const Point<T>& p);
+    inline friend std::ostream& operator<<(std::ostream& out, const Point<T, dim>& p);
     public:
         Point();
-        Point(dataT x_, dataT y_);
-        dataT getX() const;
-        dataT getY() const;
+        Point(dataT newCoords[dim]);
+        dataT operator[](int8_t coord) const;
+        dataT& operator[](int8_t coord);
         dataT distanceToOrigin() const;
         dataT distanceFromPoint(Point& p2) const;
         bool operator==(Point& p2) const;
 
     private:
-        dataT _x, _y;
+        dataT coords[dim];
 };
 
 
