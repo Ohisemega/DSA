@@ -6,9 +6,7 @@
 #include <stdexcept>
 
 BigInt::BigInt(){
-	for(int i = 0; i < digits; ++i){
-		this->integers[i] = 0;
-	}
+
 }
 
 BigInt::BigInt(const BigInt& copy){//copy constructor
@@ -62,6 +60,7 @@ BigInt& BigInt::operator=(const BigInt& copy){// Assignment operator
 	for (int i = digits-1; i >= copy.checkLeadingZeroes(); --i){
 		this->integers[i] = copy[i];
 	}
+	return *this;
 }
 
 // BigInt& BigInt::operator=(BigInt copy){
@@ -237,9 +236,11 @@ bool BigInt::operator!=(const BigInt& right) const{
 }
 
 size_t BigInt::checkLeadingZeroes() const{
-	for(int i = 0; i < digits; ++i){
+	int i = 0;
+	for(; i < digits; ++i){
 		if(this->integers[i] != 0) return i;
 	}
+	return i;
 }
 
 std::ostream& operator<<(std::ostream& output, const BigInt& bigInt){

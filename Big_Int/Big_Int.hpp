@@ -7,9 +7,9 @@
 class BigInt{
 	friend std::ostream& operator<<(std::ostream&, const BigInt&);
 	public:
-		BigInt() =delete;		
+		BigInt();		
 		BigInt(const BigInt&);
-		BigInt(unsigned long long int = 0);
+		BigInt(unsigned long long int num);
 		BigInt(const std::string&);//conversion constructor
 		BigInt(BigInt&& moveCopy) noexcept;
 
