@@ -8,7 +8,7 @@
 bool stack_sequence(const std::string& org_str, const std::string& output_str){
     std::stack<char> stck;
     int j = 0;
-    bool boolean = false;
+    bool boolean = true;
     for(int i = 0; i < org_str.length(); ++i){
         if(output_str[j] == org_str[i]){
             //pass
@@ -23,18 +23,17 @@ bool stack_sequence(const std::string& org_str, const std::string& output_str){
             stck.pop();
             ++j;
         }else{
-            return boolean;
+            boolean = false;
+            break;
         }
-
     }
-    boolean = true;
     return boolean;
 }
 
 int main(){
-    if(stack_sequence(std::string("EASY"), std::string("ASYE"))){
-        std::cout << "It is POssible\n";
+    if(stack_sequence(std::string("EASY"), std::string("ASEY"))){
+        std::cout << "It is Possible\n";
     }else{
-        std::cout << "It is not POssible\n";
+        std::cout << "It is not Possible\n";
     }
 }
