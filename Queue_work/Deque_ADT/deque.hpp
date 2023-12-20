@@ -9,13 +9,15 @@ namespace deque_template{
     class Deque{
         public:
             // Deque();
-            Deque(int32_t maxN=10);
+            Deque(int32_t maxN=50);
             ~Deque();
             bool isEmpty() const;
             bool push_back(type_t);
             bool push_front(type_t);
             std::pair<type_t, bool> pop_back();
             std::pair<type_t, bool> pop_front();
+            int32_t size() const;
+            int32_t capacity() const;
             std::pair<type_t, bool> at(int32_t)const;
             void clear();
             std::pair<type_t, bool> front() const;
@@ -23,15 +25,17 @@ namespace deque_template{
             void printArray() const;
 
         private:
-            void defaultDeque();
+            void defaultDeque(); // utility function to reset the head and tail index
+            // especially when deque is empty
+
             int32_t maxSize, head, tail, itemCount;
-            type_t q[10]; // pointer to hold array location
+            type_t* q;
             
     };
 
     template <typename type_t>
     void Deque<type_t>::printArray()const{
-        for(int i = 0; i < maxSize; ++i){
+        for(int i = 0; i <= maxSize; ++i){
             std::cout << q[i] << ", ";
         }
         std::cout << "\n";
@@ -39,24 +43,23 @@ namespace deque_template{
 
     template <typename type_t>
     Deque<type_t>::Deque(int32_t maxN){
-        maxSize = 10;
-        // q = new type_t[maxN];
-        head = maxSize - 1;
+        maxSize = maxN;
+        q = new type_t[maxSize+1];
+        head = maxSize;
         itemCount = tail = 0;
     }
 
     template <typename type_t>
     Deque<type_t>::~Deque(){
-        // delete[] q;
+        delete[] q;
+        q = nullptr;
         clear();
     }
 
     template<typename type_t>
     void Deque<type_t>::defaultDeque(){
-        if(itemCount == 0){
-            head = maxSize - 1;
-            tail = 0;
-        }
+        head = maxSize;
+        tail = 0;
     }
 
     template <typename type_t>
@@ -68,12 +71,12 @@ namespace deque_template{
     bool Deque<type_t>::push_front(type_t item){
         bool ret = false;
         // std::cout << "About to push the item!\n";
-        if((head != 0) && (itemCount != maxSize-1)){
+        if((head != 0) && (itemCount != maxSize)){
             q[head--] = item;
             ret = true;
             ++itemCount;
-        }else if((head == 0) && (tail != maxSize-1)){
-            head = maxSize-1;
+        }else if((head == 0) && (tail != maxSize)){
+            head = maxSize;
             q[head--] = item;
             ret = true;
             ++itemCount;
@@ -85,9 +88,8 @@ namespace deque_template{
     std::pair<type_t, bool> Deque<type_t>::pop_front(){
         std::pair<type_t, bool> retPair;
         retPair.second = false;
-        
         if(!isEmpty()){  
-            if(head != maxSize-1){
+            if(head != maxSize){
             retPair.first = q[++head];
             }else{
                 head = 0;
@@ -104,11 +106,11 @@ namespace deque_template{
     template <typename type_t>
     bool Deque<type_t>::push_back(type_t item){
         bool ret = false;
-        if((tail != maxSize-1) && (itemCount != maxSize-1)){
+        if((tail != maxSize) && (itemCount != maxSize)){
             q[tail++] = item;
             ret = true;
             ++itemCount;
-        }else if((tail == maxSize-1) && (head != 0)){
+        }else if((tail == maxSize) && (head != 0)){
             tail = 0;
             q[tail++] = item;
             ret = true;
@@ -125,7 +127,7 @@ namespace deque_template{
             if(tail != 0){
                 retPair.first = q[--tail];
             }else{
-                tail = maxSize-1;
+                tail = maxSize;
                 retPair.first = q[tail];
             }
             retPair.second = true;
@@ -137,11 +139,21 @@ namespace deque_template{
     }
 
     template <typename type_t>
+    int32_t Deque<type_t>::size() const{
+        return itemCount;
+    }
+
+    template <typename type_t>
+    int32_t Deque<type_t>::capacity() const{
+        return itemCount;
+    }
+
+    template <typename type_t>
     std::pair<type_t, bool> Deque<type_t>::at(int32_t index) const{
         std::pair<type_t, bool> retPair;
         retPair.second = false;
         if(!isEmpty() && (index <= itemCount)){
-            if((head + index) <= maxSize-1){
+            if((head + index) <= maxSize){
                 retPair.first = q[head + index];
             }else{
                 int32_t indx = (head+index) % maxSize;
@@ -154,8 +166,8 @@ namespace deque_template{
 
     template <typename type_t>
     void Deque<type_t>::clear(){
-        head = tail;
-        itemCount = maxSize = 0;
+        defaultDeque();
+        itemCount = 0;
     }
 }
 #endif
