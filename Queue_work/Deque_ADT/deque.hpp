@@ -26,7 +26,7 @@ namespace deque_template{
 
         private:
             void defaultDeque(); // utility function to reset the head and tail index
-            // especially when deque is empty
+            // used only when deque is finally empty
 
             int32_t maxSize, head, tail, itemCount;
             type_t* q;
