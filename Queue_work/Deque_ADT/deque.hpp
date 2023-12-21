@@ -30,7 +30,6 @@ namespace deque_template{
 
             int32_t maxSize, head, tail, itemCount;
             type_t* q;
-            
     };
 
     template <typename type_t>
@@ -75,7 +74,7 @@ namespace deque_template{
             q[head--] = item;
             ret = true;
             ++itemCount;
-        }else if((head == 0) && (tail != maxSize)){
+        }else if((head == 0) && (tail != maxSize) && (itemCount != maxSize)){
             head = maxSize;
             q[head--] = item;
             ret = true;
@@ -110,7 +109,7 @@ namespace deque_template{
             q[tail++] = item;
             ret = true;
             ++itemCount;
-        }else if((tail == maxSize) && (head != 0)){
+        }else if((tail == maxSize) && (head != 0) && (itemCount != maxSize)){
             tail = 0;
             q[tail++] = item;
             ret = true;
