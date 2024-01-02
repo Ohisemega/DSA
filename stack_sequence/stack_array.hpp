@@ -7,15 +7,20 @@ template <class Item>
 class STACK{
     private:
         Item *s;
-        Item *duplicate; 
         uint32_t N, maxCapacity;
 
     public:
         STACK(int32_t maxN){
             maxCapacity = maxN;
             s = new Item[maxN];
-            duplicate = new Item[maxN];
             N  = 0;
+        }
+
+        STACK(const STACK &) = delete;
+
+        STACK(STACK&& mvObj) : maxCapacity(mvObj.maxCapacity), N(mvObj.N), s(mvObj.s){ // move constructor
+            mvObj.s = nullptr;
+            mvObj.N = 0;
         }
         
         bool empty()const{
@@ -55,8 +60,6 @@ class STACK{
             }
             std::cout << "\n";
         }
-        
-        
 };
 
 #endif
