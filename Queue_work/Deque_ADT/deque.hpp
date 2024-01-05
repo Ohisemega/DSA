@@ -10,7 +10,11 @@ namespace deque_template{
         public:
             // Deque();
             Deque(int32_t maxN=50);
+            Deque(const Deque& copy) = delete;
+            Deque(Deque&&);
             ~Deque();
+            Deque& operator=(Deque&&); //move operator
+            Deque& operator=(const Deque&); //copy operator
             bool isEmpty() const;
             bool push_back(type_t);
             bool push_front(type_t);
@@ -47,6 +51,54 @@ namespace deque_template{
         head = maxSize;
         itemCount = tail = 0;
     }
+
+    template <typename type_t>
+    Deque<type_t>::Deque(Deque<type_t>&& moveObj){
+        this->q = moveObj.q;
+        this->maxSize = moveObj.maxSize;
+        this->head = moveObj.head;
+        this->tail = moveObj.tail;
+        this->itemCount = moveObj.itemCount;
+    }
+
+    template <typename type_t>
+    Deque<type_t>& Deque<type_t>::operator=(const Deque<type_t>& Obj){
+        if(&Obj == this)
+            return *this;
+        
+        if(this->q)
+            delete[] this->q;
+        this->q = new type_t[obj.maxSize];
+
+        for(int i = 0; i < obj.maxSize; ++i){
+            this->q[i] = Obj.q[i];
+        }
+        this->maxSize = Obj.maxSize;
+        this->head = Obj.head;
+        this->tail = Obj.tail;
+        this->itemCount = Obj.itemCount;
+
+        return *this;
+    }
+
+    template <typename type_t>
+    Deque<type_t>& Deque<type_t>::operator=(Deque<type_t>&& moveObj){
+        if(&moveObj == this)
+            return *this;
+        
+        if(this->q)
+            delete[] this->q;
+        this->q = moveObj.q;
+        this->maxSize = moveObj.maxSize;
+        this->head = moveObj.head;
+        this->tail = moveObj.tail;
+        this->itemCount = moveObj.itemCount;
+
+        moveObj.q = nullptr;
+        moveObj.maxSize = moveObj.tail = moveObj.itemCount = 0;
+        moveObj.head = -1; // left in an indeterminate state unless moveObj is 're-inited'
+    }
+
 
     template <typename type_t>
     Deque<type_t>::~Deque(){
