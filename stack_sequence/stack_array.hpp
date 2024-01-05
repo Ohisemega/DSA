@@ -10,6 +10,11 @@ class STACK{
         uint32_t N, maxCapacity;
 
     public:
+        STACK(){
+            N = maxCapacity = 0;
+            s = nullptr;
+        }
+
         STACK(int32_t maxN){
             maxCapacity = maxN;
             s = new Item[maxN];
@@ -17,10 +22,41 @@ class STACK{
         }
 
         STACK(const STACK &) = delete;
-
+        
         STACK(STACK&& mvObj) : maxCapacity(mvObj.maxCapacity), N(mvObj.N), s(mvObj.s){ // move constructor
             mvObj.s = nullptr;
-            mvObj.N = 0;
+            mvObj.maxCapacity = mvObj.N = 0;
+        }
+
+        virtual ~STACK(){
+            N = maxCapacity = 0;
+            if(this->s){
+                delete[] s;
+            }
+        }
+
+        STACK& operator=(const STACK<Item>& cpyAssObj){
+            if(this->s){
+                delete[] this->s;
+            }
+            this->s = new Item[maxCapacity];
+            this->maxCapacity = cpyAssObj.maxCapacity;
+            this->N  = cpyAssObj.N;
+            for(int i = 0; i < maxCapacity; ++i){
+                this->s[i] = cpyAssObj.s[i]; // copy objects
+            }
+            return *this;
+        }
+
+        STACK& operator=(STACK<Item>&& mvObject){
+            if(&mvObject == this)
+                return *this;
+            maxCapacity = mvObject.maxCapacity;
+            N = mvObject.N;
+            s = mvObject.s;
+            mvObject.s = nullptr;
+            mvObject.maxCapacity = mvObject.N = 0;
+            return *this;
         }
         
         bool empty()const{
