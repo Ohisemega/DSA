@@ -13,7 +13,11 @@ bool stack_sequence(const std::string& org_str, const std::string& output_str){
         if(output_str[j] == org_str[i]){
             //pass
             ++j;
-        }else{
+        }else if(!stck.empty() && (output_str[j] == stck.top())){
+            ++j;
+            stck.pop();
+        }
+        else{
             stck.push(org_str[i]);
         }
     }
@@ -31,7 +35,7 @@ bool stack_sequence(const std::string& org_str, const std::string& output_str){
 }
 
 int main(){
-    if(stack_sequence(std::string("EASY"), std::string("ASEY"))){
+    if(stack_sequence(std::string("EASY"), std::string("ESAY"))){
         std::cout << "It is Possible\n";
     }else{
         std::cout << "It is not Possible\n";
