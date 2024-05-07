@@ -15,7 +15,7 @@ int main(){
 		for(i = p; i != objArray[i]; i = objArray[i])
 			objArray[i] = objArray[objArray[i]];
 		for(j = q; j != objArray[j]; j = objArray[j])
-			objArray[j] = objArray[objArray[j]];;
+			objArray[j] = objArray[objArray[j]];
 		//std::cout << "\n";
 		//std::cout << "The roots of p: " << p << " and q: " <<q << " are "<< i << ", " << j << "\n";
 		//for (int k = 0; k < N; ++k ) std::cout << objArray[k] << " ";
