@@ -41,6 +41,7 @@ namespace List{
             bool isEvenOrOdd() const;
             std::pair<Item, bool> get();
             void printList() const;
+            void reversePairs();
     };
 
     template <typename type_t>
@@ -153,9 +154,27 @@ namespace List{
     void Linked_list<type_t>::printList() const {
         Node<type_t>* itr = this->dummyHead.next;
         while (itr->next != nullptr){
-                std::cout << itr->data << " ";
-                itr = itr->next;               
-            }
+            std::cout << itr->data << " ";
+            itr = itr->next;               
+        }
+    }
+
+    template <typename type_t> // This assumes that this* linked list is sorted
+    void Linked_list<type_t>::reversePairs() {
+        Node<type_t>* itr = this->dummyHead.next;
+        Node<type_t>* itr2;
+        Node<type_t>* temp;
+        Node<type_t>* prev = &this->dummyHead;
+        while (itr != nullptr && itr->next != nullptr){ //||_b_||-> 1* -> 2 -> 3 -> ...nullptr 
+            temp = itr->next->next; // cache the value of itr->next->next
+            itr2 = itr->next; // cache 
+            itr->next = temp;
+            itr2->next = itr;
+
+            prev->next = itr2;
+            prev = itr;
+            itr = temp;
+        }
     }
 
     template <typename type_t>

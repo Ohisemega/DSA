@@ -89,5 +89,7 @@ int main(){
     sort1.MergeSorted(sort2);
     sort1.printList();
 
-
+    sort1.reversePairs();
+    std::cout << "\n";
+    sort1.printList();
 }
