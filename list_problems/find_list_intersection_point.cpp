@@ -60,4 +60,34 @@ int main(){
     }
     std::cout << "The merging point is: " << temp->data << "\n";
     node2->next = nullptr;
+
+    List::Linked_list<int> sort1;
+    List::Linked_list<int> sort2;
+    sort1.putItem(83); // end node of list 
+    sort1.putItem(71);
+    sort1.putItem(45);
+    sort1.putItem(31);
+    sort1.putItem(21);
+    sort1.putItem(12);
+    sort1.putItem(7);
+    sort1.putItem(5);
+    sort1.putItem(4);
+    sort1.putItem(3);
+    sort1.putItem(2);// list beginning
+
+
+
+    sort2.putItem(98); // end node of list
+    sort2.putItem(87);
+    sort2.putItem(64);
+    sort2.putItem(59);
+    sort2.putItem(32);
+    sort2.putItem(12);
+    sort2.putItem(11);
+    sort2.putItem(10); // list beginning
+
+    sort1.MergeSorted(sort2);
+    sort1.printList();
+
+
 }

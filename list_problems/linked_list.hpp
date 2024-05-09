@@ -37,8 +37,10 @@ namespace List{
             void putItem(Item);
             Node<Item>* getNode(int = -1) const;
             Node<Item>* getMiddle() const;
+            void MergeSorted(Linked_list<Item>& l2_sorted);
             bool isEvenOrOdd() const;
             std::pair<Item, bool> get();
+            void printList() const;
     };
 
     template <typename type_t>
@@ -96,7 +98,6 @@ namespace List{
             fitr = fitr->next->next;
             sitr = sitr->next;
         }
-
         return sitr;
     }
 
@@ -115,10 +116,47 @@ namespace List{
         if(fitr){
             return false;
         }
-
         return true;
     }
 
+    template <typename type_t> // This assumes that this* linked list is sorted
+    void Linked_list<type_t>::MergeSorted(Linked_list<type_t>& l2_sorted) {
+        if(l2_sorted.isEmpty()) return;
+        if(this->isEmpty()){
+            this->dummyHead.next = l2_sorted.dummyHead.next;
+            l2_sorted.dummyHead.next = nullptr;
+            return;
+        }
+
+        Node<type_t>* prev1 = &this->dummyHead;
+        Node<type_t>* itr1 = this->dummyHead.next;
+        Node<type_t>* itr2 = l2_sorted.dummyHead.next;
+        
+        // merge smallest to largest (ascending -  1, 2, 3, 4, ...)
+        while(itr1 != nullptr && itr2 != nullptr){
+            Node<type_t>* temp;
+            if(itr1->data > itr2->data){ 
+                prev1->next = itr2; // make the prev pointer's next on the main line linked list point to the item to be inserted behind the current pointer
+                temp = itr2->next; // cache the next pointer of itr2 as it will be updated
+                itr2->next = itr1; // make itr2's next pointer point to the linked list of 'this'
+                itr2 = temp; // update itr2 back to it's original list
+                prev1 = prev1->next;
+            }else{
+                prev1 = itr1;
+                itr1 = itr1->next;
+            }
+        }
+        l2_sorted.dummyHead.next = nullptr;
+    }
+
+    template <typename type_t> // This assumes that this* linked list is sorted
+    void Linked_list<type_t>::printList() const {
+        Node<type_t>* itr = this->dummyHead.next;
+        while (itr->next != nullptr){
+                std::cout << itr->data << " ";
+                itr = itr->next;               
+            }
+    }
 
     template <typename type_t>
     void Linked_list<type_t>::putItem(type_t item){
