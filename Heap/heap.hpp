@@ -1,6 +1,6 @@
 #ifndef HEAP_CLASS
 #define HEAP_CLASS
-#include 
+
 template <typename type_t>
 class Heap{
     private:
