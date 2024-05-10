@@ -1,11 +1,17 @@
 #ifndef HEAP_CLASS
 #define HEAP_CLASS
 
+enum class HeapType{
+    NOT_INIT,
+    MAX_HEAP,
+    MIN_HEAP,
+};
 template <typename type_t>
 class Heap{
     private:
         type_t* array;
         std::size_t N; // array Size;
+        HeapType type;
 
     protected:
     // helper functions
