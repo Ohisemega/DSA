@@ -23,9 +23,14 @@ int main(){
     myIntStack.printIntArray();
     myIntStack.push(2);
     myIntStack.printIntArray();
+    myIntStack.pop();
+    myIntStack.printIntArray();
+    myIntStack.pop();
+    myIntStack.printIntArray();
 
     testCopy = myIntStack;
     testCopy = std::move(myIntStack);    
     testCopy.printIntArray();
-    
+    testCopy.reverseStackOrder();
+    testCopy.printIntArray();
 }
