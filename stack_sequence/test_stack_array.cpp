@@ -1,7 +1,7 @@
 #include "stack_array.hpp"
 
 int main(){
-    STACK<int> myIntStack{STACK<int>(20)};
+    STACK<int> myIntStack{STACK<int>{20}};
     STACK<int> testCopy{5};
     myIntStack.push(2);
     myIntStack.printIntArray();
@@ -24,6 +24,7 @@ int main(){
     myIntStack.push(2);
     myIntStack.printIntArray();
 
+    testCopy = std::move(myIntStack);
     testCopy = myIntStack;
     testCopy.printIntArray();
 }

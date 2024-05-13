@@ -15,13 +15,13 @@ class STACK{
             s = nullptr;
         }
 
-        STACK(int32_t maxN){
-            maxCapacity = maxN;
-            s = new Item[maxN];
-            N  = 0;
+        explicit STACK(int32_t maxN){
+            this->maxCapacity = maxN;
+            this->s = new Item[maxN];
+            this->N  = 0;
         }
 
-        STACK(const STACK &) = delete;
+        STACK(const STACK &) = delete; // delete the copy constructor
         
         STACK(STACK&& mvObj) : maxCapacity(mvObj.maxCapacity), N(mvObj.N), s(mvObj.s){ // move constructor
             mvObj.s = nullptr;
@@ -39,8 +39,8 @@ class STACK{
             if(this->s){
                 delete[] this->s;
             }
-            this->s = new Item[maxCapacity];
             this->maxCapacity = cpyAssObj.maxCapacity;
+            this->s = new Item[maxCapacity];
             this->N  = cpyAssObj.N;
             for(int i = 0; i < maxCapacity; ++i){
                 this->s[i] = cpyAssObj.s[i]; // copy objects
@@ -76,7 +76,7 @@ class STACK{
         bool push(Item item){
             int32_t count = 0;
             bool isPresent = false, retVal = false;
-            for(int i =0; i < N; ++i){
+            for(int i = 0; i < N; ++i){
                 if(s[i] == item){
                     isPresent = true;
                     break;
@@ -89,7 +89,11 @@ class STACK{
             return retVal;
         }
 
-        void printIntArray(){
+        void reverseStackOrder(){
+
+        }
+
+        void printIntArray() const{
             
             for (size_t i = 0; i < N; ++i){
                 std::cout << s[i] << ", ";
