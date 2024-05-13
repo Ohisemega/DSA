@@ -2,6 +2,7 @@
 #define STACK_ARRAY_HPP
 #include <cstdint>
 #include <utility>
+#include <algorithm>
 #include <iostream>
 template <class Item>
 class STACK{
@@ -42,9 +43,7 @@ class STACK{
             this->maxCapacity = cpyAssObj.maxCapacity;
             this->s = new Item[maxCapacity];
             this->N  = cpyAssObj.N;
-            for(int i = 0; i < maxCapacity; ++i){
-                this->s[i] = cpyAssObj.s[i]; // copy objects
-            }
+            std::copy(cpyAssObj.s, cpyAssObj.s + cpyAssObj.N, this->s);
             return *this;
         }
 
