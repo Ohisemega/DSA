@@ -27,4 +27,5 @@ int main(){
     testCopy = myIntStack;
     testCopy = std::move(myIntStack);    
     testCopy.printIntArray();
+    
 }

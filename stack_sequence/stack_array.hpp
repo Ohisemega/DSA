@@ -24,7 +24,7 @@ class STACK{
 
         STACK(const STACK &) = delete; // delete the copy constructor
         
-        STACK(STACK&& mvObj) : maxCapacity(mvObj.maxCapacity), N(mvObj.N), s(mvObj.s){ // move constructor
+        STACK(STACK&& mvObj) noexcept : maxCapacity(mvObj.maxCapacity), N(mvObj.N), s(mvObj.s) { // move constructor
             mvObj.s = nullptr;
             mvObj.maxCapacity = mvObj.N = 0;
         }
@@ -47,7 +47,7 @@ class STACK{
             return *this;
         }
 
-        STACK& operator=(STACK<Item>&& mvObject){
+        STACK& operator=(STACK<Item>&& mvObject) noexcept{
             if(&mvObject == this)
                 return *this;
             maxCapacity = mvObject.maxCapacity;
