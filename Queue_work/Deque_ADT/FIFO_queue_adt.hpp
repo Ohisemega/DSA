@@ -75,6 +75,8 @@ namespace Circular_List{
             retPair.first = rem->data;
             retPair.second = true;
             dummyHead.next = dummyHead.next->next;
+            delete rem;
+            rem = nullptr;
         }
         return retPair;
     }

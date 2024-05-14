@@ -6,9 +6,9 @@ int main(){
     deque_template::Deque<int> myDeque{10};
     myDeque.printArray();
     std::pair<int, bool> retPair;
-    myDeque.push_front(1);
+    myDeque.push_back(1);
     myDeque.printArray();
-    myDeque.push_front(2);
+    myDeque.push_back(2);
     myDeque.printArray();
     myDeque.push_back(3);
     myDeque.printArray();
@@ -20,11 +20,13 @@ int main(){
     myDeque.printArray();
     myDeque.push_back(7);
     myDeque.printArray();
-    myDeque.push_front(8);
+    myDeque.push_back(8);
     myDeque.printArray();
     myDeque.push_back(9);
     myDeque.printArray();
     myDeque.push_back(10);
+    myDeque.printArray();
+    myDeque.push_back(11);
     myDeque.printArray();
 
     if((retPair = myDeque.at(1)).second)
