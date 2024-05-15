@@ -16,7 +16,8 @@ class STACK{
                 return;
             }
 
-            tempData = this->pop().first;
+            tempData = this->top().first;
+            this->pop();
             this->InsertAtBottom(data);
             this->push(tempData);
         }
@@ -76,14 +77,20 @@ class STACK{
             return N < 0;
         }
 
-        std::pair<Item, bool> pop(){
+        std::pair<Item, bool> top() const{
             std::pair<Item, bool> retPair;
             retPair.second  = false;
             if(!this->empty()){
                 retPair.second = true;
-                retPair.first = s[N--];
+                retPair.first = s[N];
             }
             return retPair;
+        }
+
+        void pop() noexcept{
+            if(!this->empty()){
+                N--;
+            }
         }
 
         bool push(Item item){
@@ -106,7 +113,8 @@ class STACK{
             if(this->empty()) return;
 
             Item data;
-            data = this->pop().first;
+            data = this->top().first;
+            this->pop();
             reverseStackOrder();
             InsertAtBottom(data);
         }
