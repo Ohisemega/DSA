@@ -37,7 +37,9 @@ class Heap{
         HeapType getHeapType()const;
         auto getElement(int64_t)const;
         void BuildHeap();
-        // void resizeHeap(int64_t increament);
+        void InsertHeap(type_t insetElement);
+        bool HeapIncreaseKey(int indx, int key);
+        bool HeapDecreaseKey(int indx, int key);
 
     public:
         explicit Heap(std::vector<type_t>&&, HeapType type, PriorityQueue qtype);
@@ -236,6 +238,13 @@ void Heap<data_t>::BuildHeap(){
     }
 }
 
+template <typename data_t>
+void Heap<data_t>::InsertHeap(data_t insetElement){
+    array.push_back(insetElement);
+    ++this->heapSize;
+    this->BuildHeap();
+}
+
 // heap-sort is about sorting the internal array, not the heap itself
 template<typename data_t>
 void Heap<data_t>::MaxHeapSort(){
@@ -263,6 +272,30 @@ void Heap<data_t>::HeapDeleteElement(int64_t i){
         --this->heapSize;
         this->type == HeapType::MAX_HEAP ? this->MaxHeapify(i) : this->MinHeapify(i);
     }
+}
+
+template <typename data_t>
+bool Heap<data_t>::HeapIncreaseKey(int indx, int key){
+    bool ret = false;
+    if(this->qType == PriorityQueue::PRIORITY_QUEUE && this->type == HeapType::MAX_HEAP && indx <= this->heapSize \
+        && array[indx-1].key < key){
+        array[indx-1].key = key;
+        ret = true;
+        this->BuildHeap();
+    }
+    return ret;
+}
+
+template <typename data_t>
+bool Heap<data_t>::HeapDecreaseKey(int indx, int key){
+    bool ret = false;
+    if(this->qType == PriorityQueue::PRIORITY_QUEUE && this->type == HeapType::MIN_HEAP && indx <= this->heapSize \
+        && array[indx-1].key > key){
+        array[indx-1].key = key;
+        ret = true;
+        this->BuildHeap();
+    }
+    return ret;
 }
 
 #endif
