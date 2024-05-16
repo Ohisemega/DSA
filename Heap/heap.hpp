@@ -239,10 +239,19 @@ void Heap<data_t>::BuildHeap(){
 }
 
 template <typename data_t>
-void Heap<data_t>::InsertHeap(data_t insetElement){
-    array.push_back(insetElement);
-    ++this->heapSize;
-    this->BuildHeap();
+void Heap<data_t>::InsertHeap(data_t insertElement){
+    if(this->qType == PriorityQueue::PRIORITY_QUEUE){
+        data_t pObj;
+        pObj.data = insertElement.data;
+        array.push_back(pObj);
+        ++this->heapSize;
+        this->HeapIncreaseKey(this->heapSize, insertElement.key);
+    }else{
+        array.push_back(insertElement);
+        ++this->heapSize;
+        this-BuildHeap();
+    }
+    
 }
 
 // heap-sort is about sorting the internal array, not the heap itself
@@ -281,7 +290,10 @@ bool Heap<data_t>::HeapIncreaseKey(int indx, int key){
         && array[indx-1].key < key){
         array[indx-1].key = key;
         ret = true;
-        this->BuildHeap();
+        while (indx > 1 && (array[this->Parent(indx)-1].key < this->array[indx-1].key)){
+            std::swap(array[this->Parent(indx)-1], array[indx-1]);
+            indx = this->Parent(indx);
+        }
     }
     return ret;
 }
@@ -293,7 +305,10 @@ bool Heap<data_t>::HeapDecreaseKey(int indx, int key){
         && array[indx-1].key > key){
         array[indx-1].key = key;
         ret = true;
-        this->BuildHeap();
+        while (indx > 1 && (array[this->Parent(indx)-1].key > this->array[indx-1].key)){
+            std::swap(array[this->Parent(indx)-1], array[indx-1]);
+            indx = this->Parent(indx);
+        }
     }
     return ret;
 }
