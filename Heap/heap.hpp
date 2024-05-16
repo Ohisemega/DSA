@@ -277,7 +277,7 @@ void Heap<data_t>::HeapDeleteElement(int64_t i){
 template <typename data_t>
 bool Heap<data_t>::HeapIncreaseKey(int indx, int key){
     bool ret = false;
-    if(this->qType == PriorityQueue::PRIORITY_QUEUE && this->type == HeapType::MAX_HEAP && indx <= this->heapSize \
+    if(this->qType == PriorityQueue::PRIORITY_QUEUE && this->type == HeapType::MAX_HEAP && indx > 1 && indx <= this->heapSize \
         && array[indx-1].key < key){
         array[indx-1].key = key;
         ret = true;
@@ -289,7 +289,7 @@ bool Heap<data_t>::HeapIncreaseKey(int indx, int key){
 template <typename data_t>
 bool Heap<data_t>::HeapDecreaseKey(int indx, int key){
     bool ret = false;
-    if(this->qType == PriorityQueue::PRIORITY_QUEUE && this->type == HeapType::MIN_HEAP && indx <= this->heapSize \
+    if(this->qType == PriorityQueue::PRIORITY_QUEUE && this->type == HeapType::MIN_HEAP && indx > 1 && indx <= this->heapSize \
         && array[indx-1].key > key){
         array[indx-1].key = key;
         ret = true;
