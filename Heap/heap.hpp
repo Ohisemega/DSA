@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <vector>
 #include <variant>
+#include <iostream>
 enum class HeapType{
     MAX_HEAP,
     MIN_HEAP,
@@ -22,8 +23,8 @@ class Heap{
         HeapType type;
         PriorityQueue qType;
 
-        std::tuple<type_t, int64_t> findMaxIndex(int64_t parentIndx)const;
-        std::tuple<type_t, int64_t> findMinIndex(int64_t parentIndx)const;
+        std::pair<type_t, int64_t> findMaxIndex(int64_t parentIndx)const;
+        std::pair<type_t, int64_t> findMinIndex(int64_t parentIndx)const;
 
     protected:
     // helper functions
@@ -42,7 +43,7 @@ class Heap{
         bool HeapDecreaseKey(int indx, int key);
 
     public:
-        explicit Heap(std::vector<type_t>&&, HeapType type, PriorityQueue qtype);
+        explicit Heap(std::vector<type_t>&&, HeapType = HeapType::MAX_HEAP, PriorityQueue = PriorityQueue::NON_PRIORITY_QUEUE);
         Heap(Heap<type_t>&) = delete;
         Heap<type_t>& operator=(const Heap<type_t>&) = delete;
         Heap(Heap<type_t>&&); // move constructor
@@ -52,7 +53,16 @@ class Heap{
         void MaxHeapSort();
         void MinHeapSort();
         void HeapDeleteElement(int64_t i);
+        void printHeap() const;
 };
+
+template <typename data_t>
+void Heap<data_t>::printHeap()const{
+    for (size_t i = 0; i < array.size(); ++i){
+        std::cout << this->array[i] << " ";
+    }
+    std::cout << std::endl;
+}
 
 template <typename data_t>
 Heap<data_t>::Heap(std::vector<data_t>&& objArr, HeapType type, PriorityQueue qType){
@@ -60,6 +70,7 @@ Heap<data_t>::Heap(std::vector<data_t>&& objArr, HeapType type, PriorityQueue qT
     this->qType = qType;
     this->array = std::move(objArr);
     this->type = type;
+    this->printHeap();
     this->BuildHeap();
 }
 
@@ -116,59 +127,61 @@ auto Heap<data_t>::getElement(int64_t indx)const{
 }
 
 template <typename type_t>
-std::tuple<type_t, int64_t> Heap<type_t>::findMaxIndex(int64_t parentIndx)const{
+std::pair<type_t, int64_t> Heap<type_t>::findMaxIndex(int64_t parentIndx)const{
     if(parentIndx > heapSize/2) return {array[parentIndx-1], parentIndx};
     
-    size_t indxArr[SUB_TREE_SIZE] = {parentIndx, LeftChild(parentIndx).first, RightChild(parentIndx).first};
+    int64_t indxArr[SUB_TREE_SIZE] = {parentIndx, LeftChild(parentIndx).first, RightChild(parentIndx).first};
     type_t values[SUB_TREE_SIZE] = {array[parentIndx-1], array[indxArr[1]-1], array[indxArr[2]-1]};
     type_t maxKey;
-    size_t i, max_i = parentIndx;
+    size_t i;
+    int64_t max_i = parentIndx;
     if(this->qType == PriorityQueue::NON_PRIORITY_QUEUE){
         maxKey = array[parentIndx-1];
         for(i = 1; i < SUB_TREE_SIZE; ++i){
             if(values[i] > maxKey){
                 maxKey = values[i];
-                max_i = i;
+                max_i = indxArr[i];
             }
         }
     }else{
-        maxKey = array[parentIndx-1].key;
-        for(i = 1; i < SUB_TREE_SIZE; ++i){
-            if(values[i].key > maxKey){
-                maxKey = values[i].key;
-                max_i = i;
-            }
-        }
+        // maxKey = array[parentIndx-1].key;
+        // for(i = 1; i < SUB_TREE_SIZE; ++i){
+        //     if(values[i].key > maxKey){
+        //         maxKey = values[i].key;
+        //         max_i = indxArr[i];
+        //     }
+        // }
     }
-    return {maxKey, max_i};
+    return std::make_pair(maxKey, max_i);
 }
 
 template <typename type_t>
-std::tuple<type_t, int64_t> Heap<type_t>::findMinIndex(int64_t parentIndx)const{
+std::pair<type_t, int64_t> Heap<type_t>::findMinIndex(int64_t parentIndx)const{
     if(parentIndx > heapSize/2) return {array[parentIndx-1], parentIndx};
-    size_t indxArr[SUB_TREE_SIZE] = {parentIndx, LeftChild(parentIndx).first, RightChild(parentIndx).first};
+    int64_t indxArr[SUB_TREE_SIZE] = {parentIndx, LeftChild(parentIndx).first, RightChild(parentIndx).first};
     type_t values[SUB_TREE_SIZE] = {array[parentIndx-1], array[indxArr[1]-1], array[indxArr[2]-1]};
     type_t minKey;
-    size_t i, min_i = parentIndx;
+    size_t i; 
+    int64_t min_i = parentIndx;
 
     if(this->qType == PriorityQueue::NON_PRIORITY_QUEUE){
         minKey = array[parentIndx-1];
         for(i = 1; i < SUB_TREE_SIZE; ++i){
             if(values[i] < minKey){
                 minKey = values[i];
-                min_i = i;
+                min_i = indxArr[i];
             }
         }
     }else{
-        minKey = array[parentIndx-1].key;
-        for(i = 1; i < SUB_TREE_SIZE; ++i){
-            if(values[i].key < minKey){
-                minKey = values[i].key;
-                min_i = i;
-            }
-        }
+        // minKey = array[parentIndx-1].key;
+        // for(i = 1; i < SUB_TREE_SIZE; ++i){
+        //     if(values[i].key < minKey){
+        //         minKey = values[i].key;
+        //         min_i = indxArr[i];
+        //     }
+        // }
     }
-    return {minKey, min_i};
+    return std::make_pair(minKey, min_i);
 }
 
 template <typename data_t>
@@ -181,7 +194,7 @@ std::pair<int64_t, bool> Heap<data_t>::Parent(int64_t i) const{
 
 template <typename data_t>
 std::pair<int64_t, bool> Heap<data_t>::LeftChild(int64_t i) const{
-    if((i > 0) && (i < ((this->heapSize/2) + 1))){
+    if((i > 0) && (i < ((this->heapSize/2) + 1)) && (2*i) < this->heapSize){
         return std::make_pair(2*i, true);     
     }
     return std::make_pair(i, false);
@@ -189,7 +202,7 @@ std::pair<int64_t, bool> Heap<data_t>::LeftChild(int64_t i) const{
 
 template <typename data_t>
 std::pair<int64_t, bool> Heap<data_t>::RightChild(int64_t i) const{
-    if((i >= 1) && (i < ((this->heapSize/2) + 1))){
+    if((i >= 1) && (i < ((this->heapSize/2) + 1)) && ((2*i)+1) < this->heapSize){
         return std::make_pair((2*i) + 1, true);     
     }
     return std::make_pair(i, false);
@@ -202,10 +215,10 @@ void Heap<data_t>::MaxHeapify(int64_t i){
     // array[i] holds that same property with respect to it's left and right children, but 
     // that check may invalidate one sub-tree, hence we recursively call it.
     if(i > 0 && i <= this->heapSize/2){
-        auto maxElem = findMaxIndex(i);
-        if(std::get<int64_t>(maxElem) != i){
-            std::swap(std::get<data_t>(maxElem), array[i-1]);
-            MaxHeapify(std::get<int64_t>(maxElem));
+        std::pair<data_t, int64_t> maxElem = findMaxIndex(i);
+        if(maxElem.second != i){
+            std::swap(array[maxElem.second-1], array[i-1]);
+            MaxHeapify(maxElem.second);
         }
     }
 }
@@ -219,7 +232,7 @@ void Heap<data_t>::MinHeapify(int64_t i){
     if(i > 0 && i <= this->heapSize/2){
         auto minElem = findMinIndex(i);
         if(std::get<int64_t>(minElem) != i){
-            std::swap(std::get<data_t>(minElem), array[i-1]);
+            std::swap(array[minElem.second-1], array[i-1]);
             MinHeapify(std::get<int64_t>(minElem));
         }
     }
@@ -228,7 +241,7 @@ void Heap<data_t>::MinHeapify(int64_t i){
 template <typename data_t>
 void Heap<data_t>::BuildHeap(){
     if(this->type == HeapType::MAX_HEAP){
-        for (size_t i = heapSize/2; i > 0; --i){
+        for (size_t i = this->heapSize/2; i > 0; --i){
             MaxHeapify(i);
         }
     }else{
@@ -258,9 +271,12 @@ void Heap<data_t>::InsertHeap(data_t insertElement){
 template<typename data_t>
 void Heap<data_t>::MaxHeapSort(){
     this->BuildHeap();
-    for (;this->heapSize > 1; --this->heapSize){
-        std::swap(array[1], array[heapSize-1]);
-        MaxHeapify(1); // keep the maximum at the root of the tree, preserve max-heap property
+    for (;this->heapSize > 1;){
+        std::swap(array[0], array[heapSize-1]);
+        this->printHeap();
+        --this->heapSize;
+        MaxHeapify(1); // keep the maximum at the root of the tree, preserve max-heap property for 1 to heapsize
+        this->printHeap();
     }
 }
 
@@ -269,7 +285,7 @@ template<typename data_t>
 void Heap<data_t>::MinHeapSort(){
     this->BuildHeap();
     for (;this->heapSize > 1; --this->heapSize){
-        std::swap(array[1], array[heapSize-1]); 
+        std::swap(array[0], array[heapSize-1]); 
         MinHeapify(1); // keep the minimum at the root of the tree, preserve min-heap property
     }
 }
