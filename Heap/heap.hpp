@@ -31,11 +31,11 @@ class Heap{
         std::pair<int64_t, bool> Parent(int64_t i) const;
         std::pair<int64_t, bool> LeftChild(int64_t i) const;
         std::pair<int64_t, bool> RightChild(int64_t i) const;
-        void MaxHeapify(int64_t i);
-        void MinHeapify(int64_t i);
-        int64_t getHeapSize()const;
-        int64_t getArraySize()const;
-        HeapType getHeapType()const;
+        void MaxHeapify(int64_t i) noexcept;
+        void MinHeapify(int64_t i) noexcept;
+        int64_t getHeapSize()const noexcept;
+        int64_t getArraySize()const noexcept;
+        HeapType getHeapType()const noexcept;
         auto getElement(int64_t)const;
         void BuildHeap();
         void InsertHeap(type_t insetElement);
@@ -46,8 +46,8 @@ class Heap{
         explicit Heap(std::vector<type_t>&&, HeapType = HeapType::MAX_HEAP, PriorityQueue = PriorityQueue::NON_PRIORITY_QUEUE);
         Heap(Heap<type_t>&) = delete;
         Heap<type_t>& operator=(const Heap<type_t>&) = delete;
-        Heap(Heap<type_t>&&); // move constructor
-        Heap<type_t>& operator=(const Heap<type_t>&&);
+        Heap(Heap<type_t>&&)noexcept; // move constructor
+        Heap<type_t>& operator=(const Heap<type_t>&&) noexcept;
         virtual ~Heap();
         void configureHeapType(HeapType type);
         void MaxHeapSort();
@@ -75,14 +75,14 @@ Heap<data_t>::Heap(std::vector<data_t>&& objArr, HeapType type, PriorityQueue qT
 }
 
 template <typename data_t>
-Heap<data_t>::Heap(Heap<data_t>&& mvObj){ // move constructor
+Heap<data_t>::Heap(Heap<data_t>&& mvObj) noexcept{ // move constructor
     this->type = mvObj.type;
     this->heapSize = mvObj.heapSize;
     this->array = std::move(mvObj.array);
 }
 
 template <typename data_t>
-Heap<data_t>& Heap<data_t>::operator=(const Heap<data_t>&& mvObj){
+Heap<data_t>& Heap<data_t>::operator=(const Heap<data_t>&& mvObj) noexcept{
     this->type = mvObj.type;
     this->heapSize = mvObj.heapSize;
     this->array = std::move(mvObj.array);
@@ -95,17 +95,17 @@ Heap<data_t>::~Heap(){
 }
 
 template <typename data_t>
-int64_t Heap<data_t>::getHeapSize()const{
+int64_t Heap<data_t>::getHeapSize()const noexcept{
     return this->heapSize;
 }
 
 template <typename data_t>
-int64_t Heap<data_t>::getArraySize()const{
+int64_t Heap<data_t>::getArraySize()const noexcept{
     return this->array.capacity();
 }
 
 template <typename data_t>
-HeapType Heap<data_t>::getHeapType()const{
+HeapType Heap<data_t>::getHeapType()const noexcept{
     return this->type;
 }
 
@@ -209,7 +209,7 @@ std::pair<int64_t, bool> Heap<data_t>::RightChild(int64_t i) const{
 }
 
 template <typename data_t>
-void Heap<data_t>::MaxHeapify(int64_t i){
+void Heap<data_t>::MaxHeapify(int64_t i) noexcept{
     // assumes that the sub-trees at the left and right child nodes are 
     // max-heaps or hold the max-heap property. Now it must verify that 
     // array[i] holds that same property with respect to it's left and right children, but 
@@ -224,7 +224,7 @@ void Heap<data_t>::MaxHeapify(int64_t i){
 }
 
 template <typename data_t>
-void Heap<data_t>::MinHeapify(int64_t i){
+void Heap<data_t>::MinHeapify(int64_t i) noexcept{
     // assumes that the sub-trees at the left and right child nodes are 
     // min-heaps or hold the min-heap property. Now it must verify that 
     // array[i-1] holds that same property with respect to it's left and right children, but 
