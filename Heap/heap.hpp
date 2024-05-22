@@ -10,7 +10,7 @@ enum class HeapType{
     MIN_HEAP,
 };
 
-enum class PriorityQueue{
+enum class PQueue{
     PRIORITY_QUEUE,
     NON_PRIORITY_QUEUE,
 };
@@ -21,7 +21,7 @@ class Heap{
         std::vector<type_t> array;
         int64_t heapSize;
         HeapType type;
-        PriorityQueue qType;
+        PQueue qType;
 
         std::pair<type_t, int64_t> findMaxIndex(int64_t parentIndx)const;
         std::pair<type_t, int64_t> findMinIndex(int64_t parentIndx)const;
@@ -36,14 +36,15 @@ class Heap{
         int64_t getHeapSize()const noexcept;
         int64_t getArraySize()const noexcept;
         HeapType getHeapType()const noexcept;
-        auto getElement(int64_t)const;
+        std::pair<type_t, bool> getElement(int64_t)const;
+        std::pair<type_t&, bool> getElement(int64_t);
         void BuildHeap();
         void InsertHeap(type_t insetElement);
-        bool HeapIncreaseKey(int indx, int key);
-        bool HeapDecreaseKey(int indx, int key);
+        void HeapIncreaseKey(int indx)noexcept;
+        void HeapDecreaseKey(int indx)noexcept;
 
     public:
-        explicit Heap(std::vector<type_t>&&, HeapType = HeapType::MAX_HEAP, PriorityQueue = PriorityQueue::NON_PRIORITY_QUEUE);
+        explicit Heap(std::vector<type_t>&&, HeapType = HeapType::MAX_HEAP, PQueue = PQueue::NON_PRIORITY_QUEUE);
         Heap(Heap<type_t>&) = delete;
         Heap<type_t>& operator=(const Heap<type_t>&) = delete;
         Heap(Heap<type_t>&&)noexcept; // move constructor
@@ -65,7 +66,7 @@ void Heap<data_t>::printHeap()const{
 }
 
 template <typename data_t>
-Heap<data_t>::Heap(std::vector<data_t>&& objArr, HeapType type, PriorityQueue qType){
+Heap<data_t>::Heap(std::vector<data_t>&& objArr, HeapType type, PQueue qType){
     this->heapSize = objArr.size();
     this->qType = qType;
     this->array = std::move(objArr);
@@ -117,14 +118,21 @@ void Heap<data_t>::configureHeapType(HeapType type){
 }
 
 template <typename data_t>
-auto Heap<data_t>::getElement(int64_t indx)const{
+std::pair<data_t, bool> Heap<data_t>::getElement(int64_t indx)const{
     if(indx < this->heapSize){
-        return std::make_pair(array.at(indx-1), true);
+        return std::make_pair(array[indx-1], true);
     }
     static_assert(std::is_default_constructible<data_t>::value, "Class Heap data specialization is NOT default constructible!");
     data_t data;
     return std::make_pair(data, false);
 }
+
+template <typename data_t>
+std::pair<data_t&, bool> Heap<data_t>::getElement(int64_t indx){
+    if(indx < 1 || indx >= this->heapSize) throw std::out_of_range{"Subscript out of range1"};
+    return array[indx];
+}
+
 
 template <typename type_t>
 std::pair<type_t, int64_t> Heap<type_t>::findMaxIndex(int64_t parentIndx)const{
@@ -135,7 +143,7 @@ std::pair<type_t, int64_t> Heap<type_t>::findMaxIndex(int64_t parentIndx)const{
     type_t maxKey;
     size_t i;
     int64_t max_i = parentIndx;
-    if(this->qType == PriorityQueue::NON_PRIORITY_QUEUE){
+    if(this->qType == PQueue::NON_PRIORITY_QUEUE){
         maxKey = array[parentIndx-1];
         for(i = 1; i < SUB_TREE_SIZE; ++i){
             if(values[i] > maxKey){
@@ -164,7 +172,7 @@ std::pair<type_t, int64_t> Heap<type_t>::findMinIndex(int64_t parentIndx)const{
     size_t i; 
     int64_t min_i = parentIndx;
 
-    if(this->qType == PriorityQueue::NON_PRIORITY_QUEUE){
+    if(this->qType == PQueue::NON_PRIORITY_QUEUE){
         minKey = array[parentIndx-1];
         for(i = 1; i < SUB_TREE_SIZE; ++i){
             if(values[i] < minKey){
@@ -253,7 +261,7 @@ void Heap<data_t>::BuildHeap(){
 
 template <typename data_t>
 void Heap<data_t>::InsertHeap(data_t insertElement){
-    if(this->qType == PriorityQueue::PRIORITY_QUEUE){
+    if(this->qType == PQueue::PRIORITY_QUEUE){
         data_t pObj;
         pObj.data = insertElement.data;
         array.push_back(pObj);
@@ -300,33 +308,23 @@ void Heap<data_t>::HeapDeleteElement(int64_t i){
 }
 
 template <typename data_t>
-bool Heap<data_t>::HeapIncreaseKey(int indx, int key){
-    bool ret = false;
-    if(this->qType == PriorityQueue::PRIORITY_QUEUE && this->type == HeapType::MAX_HEAP && indx > 1 && indx <= this->heapSize \
-        && array[indx-1].key < key){
-        array[indx-1].key = key;
-        ret = true;
+void Heap<data_t>::HeapIncreaseKey(int indx)noexcept{
+    if(this->qType == PQueue::PRIORITY_QUEUE && this->type == HeapType::MAX_HEAP && indx > 1 && indx <= this->heapSize){
         while (indx > 1 && (array[this->Parent(indx)-1].key < this->array[indx-1].key)){
             std::swap(array[this->Parent(indx)-1], array[indx-1]);
             indx = this->Parent(indx);
         }
     }
-    return ret;
 }
 
 template <typename data_t>
-bool Heap<data_t>::HeapDecreaseKey(int indx, int key){
-    bool ret = false;
-    if(this->qType == PriorityQueue::PRIORITY_QUEUE && this->type == HeapType::MIN_HEAP && indx > 1 && indx <= this->heapSize \
-        && array[indx-1].key > key){
-        array[indx-1].key = key;
-        ret = true;
-        while (indx > 1 && (array[this->Parent(indx)-1].key > this->array[indx-1].key)){
+void Heap<data_t>::HeapDecreaseKey(int indx)noexcept{
+    if(this->qType == PQueue::PRIORITY_QUEUE && this->type == HeapType::MIN_HEAP && indx > 1 && indx <= this->heapSize){
+        while (indx > 1 && (array[this->Parent(indx)-1] > this->array[indx-1])){
             std::swap(array[this->Parent(indx)-1], array[indx-1]);
             indx = this->Parent(indx);
         }
     }
-    return ret;
 }
 
 #endif

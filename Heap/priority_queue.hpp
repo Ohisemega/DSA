@@ -8,8 +8,26 @@ struct Pobject{
     Pobject(){
         key = -1;
     }
-    int key;
-    data_t data;
+    Pobject(int key){
+        this->key = key;
+    }
+    Pobject(data_t data, int key){
+        this->key = key;
+        this->data = data;
+    }
+
+    bool operator<(const Pobject<data_t>& obj) const noexcept{
+        return this->key < obj.key;
+    }
+    bool operator>(const Pobject<data_t>& obj) const noexcept{
+        return this->key > obj.key;
+    }
+    bool operator==(const Pobject<data_t>& obj) const noexcept{
+        return this->key == obj.key;
+    }
+    private:
+        int key;
+        data_t data;
 };
 
 template<typename type_t>
@@ -47,12 +65,28 @@ std::pair<data_t, bool> PriorityQueue<data_t>::ExtractMaxMin_mum(){
 
 template<typename data_t>
 bool PriorityQueue<data_t>::IncreaseKey(int indx, int key){
-    return Heap<Pobject<data_t>>::HeapIncreaseKey(indx, key);
+    bool ret = false;
+    if(Heap<Pobject<data_t>>::getElement(indx).second && Heap<Pobject<data_t>>::getElement(indx) > Pobject<data_t>(key) && Heap<Pobject<data_t>>::getHeapType() == HeapType::MAX_HEAP){
+        Pobject<data_t> temp{Heap<Pobject<data_t>>::getElement(indx)};
+        temp.key = key;
+        Heap<Pobject<data_t>>::getElement(indx) = temp;
+        Heap<Pobject<data_t>>::HeapIncreaseKey(indx);
+        ret = true;
+    }
+    return ret;
 }
 
 template<typename data_t>
 bool PriorityQueue<data_t>::DecreaseKey(int indx, int key){
-    return Heap<Pobject<data_t>>::HeapDecreaseKey(indx, key);
+    bool ret = false;
+    if(Heap<Pobject<data_t>>::getElement(indx).second && Heap<Pobject<data_t>>::getElement(indx) < Pobject<data_t>(key) && Heap<Pobject<data_t>>::getHeapType() == HeapType::MIN_HEAP){
+        Pobject<data_t> temp{Heap<Pobject<data_t>>::getElement(indx)};
+        temp.key = key;
+        Heap<Pobject<data_t>>::getElement(indx) = temp;
+        Heap<Pobject<data_t>>::HeapDecreaseKey(indx);
+        ret = true;
+    }
+    return ret;
 }
 
 template<typename data_t>
