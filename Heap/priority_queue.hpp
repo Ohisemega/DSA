@@ -38,11 +38,14 @@ class PriorityQueue : public Heap<Pobject<type_t>>{
         using Heap<type_t>::Heap;
         virtual ~PriorityQueue() = default;
         void Insert(Pobject<type_t>);
-        std::pair<type_t, bool> MaxMin_mum() const;
-        std::pair<type_t, bool> ExtractMaxMin_mum();
+        std::pair<type_t, bool> Maximum() const noexcept;
+        std::pair<type_t, bool> Minimum() const noexcept;
+        std::pair<type_t, bool> ExtractMax();
+        std::pair<type_t, bool> ExtractMin();
         void HeapDeleteElement(int64_t i);
         bool IncreaseKey(int indx, int key);
         bool DecreaseKey(int indx, int key);
+        HeapType getPriorityQueueType() const noexcept; 
 };
 
 template<typename data_t>
@@ -51,13 +54,33 @@ void PriorityQueue<data_t>::Insert(Pobject<data_t> obj){
 }
 
 template<typename data_t>
-std::pair<data_t, bool> PriorityQueue<data_t>::MaxMin_mum() const{
-    std::pair<data_t, bool> obj = Heap<Pobject<data_t>>::getElement(1);
+HeapType PriorityQueue<data_t>::getPriorityQueueType() const noexcept{
+    return Heap<Pobject<data_t>>::getHeapType();
+}
+
+template<typename data_t>
+std::pair<data_t, bool> PriorityQueue<data_t>::Maximum() const noexcept{
+    std::pair<Pobject<data_t>, bool> obj = Heap<Pobject<data_t>>::getElement(1);
+    if(Heap<Pobject<data_t>>::getHeapType() == HeapType::MIN_HEAP) obj.second = false;
     return std::make_pair(obj.first.data, obj.second);
 }
 
 template<typename data_t>
-std::pair<data_t, bool> PriorityQueue<data_t>::ExtractMaxMin_mum(){
+std::pair<data_t, bool> PriorityQueue<data_t>::Minimum() const noexcept{
+    std::pair<Pobject<data_t>, bool> obj = Heap<Pobject<data_t>>::getElement(1);
+    if(Heap<Pobject<data_t>>::getHeapType() == HeapType::MAX_HEAP) obj.second = false;
+    return std::make_pair(obj.first.data, obj.second);
+}
+
+template<typename data_t>
+std::pair<data_t, bool> PriorityQueue<data_t>::ExtractMax(){
+    auto obj = Heap<Pobject<data_t>>::getElement(1);
+    Heap<data_t>::HeapDeleteElement(1);
+    return std::make_pair(obj.first.data, obj.second);
+}
+
+template<typename data_t>
+std::pair<data_t, bool> PriorityQueue<data_t>::ExtractMin(){
     auto obj = Heap<Pobject<data_t>>::getElement(1);
     Heap<data_t>::HeapDeleteElement(1);
     return std::make_pair(obj.first.data, obj.second);
