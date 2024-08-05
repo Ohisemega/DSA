@@ -13,7 +13,7 @@ enum class HeapType{
 template <typename type_t>
 class Heap{
     private:
-        #define SUB_TREE_SIZE 3
+        constexpr int SUB_TREE_SIZE 3;
         std::vector<type_t> array;
         int64_t heapSize;
         HeapType type;
@@ -28,9 +28,9 @@ class Heap{
         std::pair<int64_t, bool> RightChild(int64_t i) const;
         void MaxHeapify(int64_t i) noexcept;
         void MinHeapify(int64_t i) noexcept;
-        int64_t getHeapSize()const noexcept;
-        int64_t getArraySize()const noexcept;
-        HeapType getHeapType()const noexcept;
+        constexpr int64_t getHeapSize()const noexcept;
+        constexpr int64_t getArraySize()const noexcept;
+        constexpr HeapType getHeapType()const noexcept;
         std::pair<type_t, bool> getElement(int64_t)const;
         std::pair<type_t&, bool> getElement(int64_t);
         void BuildHeap();
@@ -40,10 +40,12 @@ class Heap{
 
     public:
         explicit Heap(std::vector<type_t>&&, HeapType = HeapType::MAX_HEAP);
-        Heap(Heap<type_t>&) = delete;
-        Heap<type_t>& operator=(const Heap<type_t>&) = delete;
+        Heap(std::initializer_list<type_t>, HeapType = HeapType::MAX_HEAP);
+        Heap(size_t heapSize, HeapType = HeapType::MAX_HEAP);
+        Heap(const Heap<type_t>&) =delete; // conversion operator
+        Heap<type_t>& operator=(const Heap<type_t>&) =delete;  // copy assignment operator deleted
         Heap(Heap<type_t>&&)noexcept; // move constructor
-        Heap<type_t>& operator=(const Heap<type_t>&&) noexcept;
+        Heap<type_t>& operator=(const Heap<type_t>&&) noexcept; // move assignment operator
         virtual ~Heap();
         void configureHeapType(HeapType type);
         void MaxHeapSort();
@@ -60,10 +62,20 @@ void Heap<data_t>::printHeap()const{
     std::cout << std::endl;
 }
 
+
+
 template <typename data_t>
 Heap<data_t>::Heap(std::vector<data_t>&& objArr, HeapType type){
     this->heapSize = objArr.size();
     this->array = std::move(objArr);
+    this->type = type;
+    this->printHeap();
+    this->BuildHeap();
+}
+
+template <typename data_t>
+Heap<data_t>::Heap(std::initializer_list<data_t> list, HeapType type) : array(list){
+    this-> = list._M_len;
     this->type = type;
     this->printHeap();
     this->BuildHeap();
@@ -90,17 +102,17 @@ Heap<data_t>::~Heap(){
 }
 
 template <typename data_t>
-int64_t Heap<data_t>::getHeapSize()const noexcept{
+constexpr int64_t Heap<data_t>::getHeapSize()const noexcept{
     return this->heapSize;
 }
 
 template <typename data_t>
-int64_t Heap<data_t>::getArraySize()const noexcept{
+constexpr int64_t Heap<data_t>::getArraySize()const noexcept{
     return this->array.capacity();
 }
 
 template <typename data_t>
-HeapType Heap<data_t>::getHeapType()const noexcept{
+constexpr HeapType Heap<data_t>::getHeapType()const noexcept{
     return this->type;
 }
 
@@ -130,7 +142,7 @@ std::pair<data_t&, bool> Heap<data_t>::getElement(int64_t indx){
 
 template <typename type_t>
 std::pair<type_t, int64_t> Heap<type_t>::findMaxIndex(int64_t parentIndx)const{
-    if(parentIndx > heapSize/2) return {array[parentIndx-1], parentIndx};
+    if(parentIndx > (heapSize >> 1)) return {array[parentIndx-1], parentIndx};
     
     int64_t indxArr[SUB_TREE_SIZE] = {parentIndx, LeftChild(parentIndx).first, RightChild(parentIndx).first};
     type_t values[SUB_TREE_SIZE] = {array[parentIndx-1], array[indxArr[1]-1], array[indxArr[2]-1]};
@@ -139,6 +151,7 @@ std::pair<type_t, int64_t> Heap<type_t>::findMaxIndex(int64_t parentIndx)const{
     int64_t max_i = parentIndx;
 
     maxKey = array[parentIndx-1];
+    // maxKey = 0;
     for(i = 1; i < SUB_TREE_SIZE; ++i){
         if(values[i] > maxKey){
             maxKey = values[i];
@@ -150,7 +163,7 @@ std::pair<type_t, int64_t> Heap<type_t>::findMaxIndex(int64_t parentIndx)const{
 
 template <typename type_t>
 std::pair<type_t, int64_t> Heap<type_t>::findMinIndex(int64_t parentIndx)const{
-    if(parentIndx > heapSize/2) return {array[parentIndx-1], parentIndx};
+    if(parentIndx > heapSize >> 1) return {array[parentIndx-1], parentIndx};
     int64_t indxArr[SUB_TREE_SIZE] = {parentIndx, LeftChild(parentIndx).first, RightChild(parentIndx).first};
     type_t values[SUB_TREE_SIZE] = {array[parentIndx-1], array[indxArr[1]-1], array[indxArr[2]-1]};
     type_t minKey;
@@ -170,14 +183,14 @@ std::pair<type_t, int64_t> Heap<type_t>::findMinIndex(int64_t parentIndx)const{
 template <typename data_t>
 std::pair<int64_t, bool> Heap<data_t>::Parent(int64_t i) const{
     if((i >= 2) && (i <= this->heapSize)){
-        return std::make_pair(i/2, true);
+        return std::make_pair(i >> 1, true);
     }
     return std::make_pair(1, false); // return the root of the heap
 }
 
 template <typename data_t>
 std::pair<int64_t, bool> Heap<data_t>::LeftChild(int64_t i) const{
-    if((i > 0) && (i < ((this->heapSize/2) + 1)) && (2*i) < this->heapSize){
+    if((i > 0) && (i < ((this->heapSize >> 1) + 1)) && (2*i) < this->heapSize){
         return std::make_pair(2*i, true);     
     }
     return std::make_pair(i, false);
@@ -185,7 +198,7 @@ std::pair<int64_t, bool> Heap<data_t>::LeftChild(int64_t i) const{
 
 template <typename data_t>
 std::pair<int64_t, bool> Heap<data_t>::RightChild(int64_t i) const{
-    if((i >= 1) && (i < ((this->heapSize/2) + 1)) && ((2*i)+1) < this->heapSize){
+    if((i >= 1) && (i < ((this->heapSize >> 1) + 1)) && ((2*i)+1) < this->heapSize){
         return std::make_pair((2*i) + 1, true);     
     }
     return std::make_pair(i, false);
@@ -197,7 +210,7 @@ void Heap<data_t>::MaxHeapify(int64_t i) noexcept{
     // max-heaps or hold the max-heap property. Now it must verify that 
     // array[i] holds that same property with respect to it's left and right children, but 
     // that check may invalidate one sub-tree, hence we recursively call it.
-    if(i > 0 && i <= this->heapSize/2){
+    if(i > 0 && i <= this->heapSize >> 1){
         std::pair<data_t, int64_t> maxElem = findMaxIndex(i);
         if(maxElem.second != i){
             std::swap(array[maxElem.second-1], array[i-1]);
@@ -212,7 +225,7 @@ void Heap<data_t>::MinHeapify(int64_t i) noexcept{
     // min-heaps or hold the min-heap property. Now it must verify that 
     // array[i-1] holds that same property with respect to it's left and right children, but 
     // that check may invalidate one sub-tree, hence we recursively call it.
-    if(i > 0 && i <= this->heapSize/2){
+    if(i > 0 && i <= (this->heapSize >> 1)){
         auto minElem = findMinIndex(i);
         if(std::get<int64_t>(minElem) != i){
             std::swap(array[minElem.second-1], array[i-1]);
@@ -224,11 +237,11 @@ void Heap<data_t>::MinHeapify(int64_t i) noexcept{
 template <typename data_t>
 void Heap<data_t>::BuildHeap(){
     if(this->type == HeapType::MAX_HEAP){
-        for (size_t i = this->heapSize/2; i > 0; --i){
+        for (size_t i = this->heapSize >> 1; i > 0; --i){
             MaxHeapify(i);
         }
     }else{
-        for (size_t i = heapSize/2; i > 0; --i){
+        for (size_t i = heapSize >> 1; i > 0; --i){
             MinHeapify(i);
         }
     }
@@ -289,7 +302,7 @@ void Heap<data_t>::HeapDecreaseKey(int indx)noexcept{
         while (indx > 1 && (array[this->Parent(indx)-1] > this->array[indx-1])){
             std::swap(array[this->Parent(indx)-1], array[indx-1]);
             indx = this->Parent(indx);
-        }
+        }3
     }
 }
 
