@@ -92,4 +92,8 @@ int main(){
     sort1.reversePairs();
     std::cout << "\n";
     sort1.printList();
+
+    sort1.moveEvenBack();
+    std::cout << "\n";
+    sort1.printList();
 }
