@@ -1,5 +1,5 @@
-#ifndef BIG_INT
-#define BIG_INT
+#ifndef BIG_INT_H
+#define BIG_INT_H
 
 #include <array>
 #include <string>
@@ -10,7 +10,7 @@ class BigInt{
 		BigInt();		
 		BigInt(const BigInt&);
 		BigInt(unsigned long long int num);
-		BigInt(const std::string&);//conversion constructor
+		BigInt(const std::string&); // conversion constructor
 		BigInt(BigInt&& moveCopy) noexcept;
 
 		//Mathematical Operations
@@ -19,6 +19,7 @@ class BigInt{
 		// BigInt& operator=(BigInt&& right) noexcept;
 		
 		void swap(BigInt&) noexcept;
+		operator std::string() const; // conversion operator to a string
 		BigInt operator+(const BigInt&) const;
 		BigInt& operator+=(const BigInt& right);
 		BigInt operator-(const BigInt&) const;
@@ -32,10 +33,10 @@ class BigInt{
 
 		//Element operations
 		short& operator[](int);
-		short operator[](int) const;
+		constexpr short operator[](int) const;
 
 		//comparison symbols
-		bool isZero() const;
+		constexpr bool isZero() const;
 		bool  operator==(const BigInt&) const;
 		bool  operator>(const BigInt&) const;
 		bool  operator<(const BigInt& right) const;
@@ -48,10 +49,11 @@ class BigInt{
 		//print operation
 		void print()const;
 	private:
-		static const int digits = 1000;
+		char sign;
+		static constexpr int digits = 1000;
 		std::array<short, digits>integers{};
-		size_t checkLeadingZeroes()const;
+		constexpr size_t checkLeadingZeroes()const;
 		
 };
 
-#endif
+#endif /* end #define BIG_INT_H*/

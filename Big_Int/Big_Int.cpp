@@ -30,7 +30,7 @@ BigInt::BigInt(unsigned long long int val){
 		this->integers[i] = b;
 		val = val/10;
 	}
-	if(i <= 0 && val != 0) throw std::invalid_argument("The value provided is too large!");
+	if(i <= 0 && val != 0) throw std::length_error("The value provided is too large!");
 }
 
 void BigInt::swap(BigInt& other) noexcept{
@@ -50,7 +50,7 @@ BigInt::BigInt(const std::string& numberStr){
 			}
 		}
 	}else{
-		throw std::invalid_argument("The string provided is too large!");
+		throw std::length_error("The string provided is too large!");
 	}
 }
 
@@ -61,6 +61,10 @@ BigInt& BigInt::operator=(const BigInt& copy){// Assignment operator
 		this->integers[i] = copy[i];
 	}
 	return *this;
+}
+
+BigInt::operator std::string() const{
+	
 }
 
 // BigInt& BigInt::operator=(BigInt copy){
@@ -82,7 +86,7 @@ BigInt BigInt::operator+(const BigInt& right) const{
 		val > 9 ? (carry = 1, val %= 10) : carry = 0;
 		ret.integers[i] = val;
 	}
-	if(i <= 0 && carry != 0) throw std::invalid_argument("This addition is too large for the class");
+	if(i <= 0 && carry != 0) throw std::length_error("This addition is too large for the class");
 	return ret;
 }
 
