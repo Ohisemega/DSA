@@ -1,7 +1,7 @@
 #include "tree.hpp"
 #include <queue>
 
-void Level_order_traversal_iterative(Tree* root){
+void LevelOrder_traversal_iterative(Tree* root){
     std::queue<Tree*> que;
     Tree* current = root;
     que.emplace(current);
