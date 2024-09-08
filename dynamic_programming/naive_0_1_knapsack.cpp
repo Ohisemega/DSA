@@ -7,7 +7,7 @@
 int Naive_01KnapSack_sol(int index, int capacity, std::vector<int>& value, std::vector<int>& cap){
     if(index == 0 || capacity == 0){
         return 0;
-    }else if(value[index] > capacity){
+    }else if(cap[index] > capacity){
         return Naive_01KnapSack_sol(index - 1, capacity, value, cap);
     }else{
         return std::max(Naive_01KnapSack_sol(index - 1, capacity, value, cap), \
