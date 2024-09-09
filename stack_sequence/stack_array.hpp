@@ -3,11 +3,14 @@
 #include <cstdint>
 #include <utility>
 #include <algorithm>
+#include <memory>
 #include <iostream>
-template <class Item>
+#include <stdexcept>
+
+template <typename Item>
 class STACK{
     private:
-        Item *s;
+        std::unique_ptr<Item> s;
         int N, maxCapacity;
         void InsertAtBottom(Item data){
             Item tempData;
@@ -24,14 +27,17 @@ class STACK{
 
     public:
         STACK(){
-            maxCapacity = 0;
+            maxCapacity = 10;
             N = -1;
-            s = nullptr;
+            s = std::unique_ptr<Item>{new Item[maxCapacity]};
         }
 
         explicit STACK(int32_t maxN){
+            if(maxN <= 0){
+                throw std::length_error{std::string("Stack size is < 0!\n")};
+            }
+            s = std::unique_ptr<Item>{new Item[maxN]};
             this->maxCapacity = maxN;
-            this->s = new Item[maxN];
             this->N  = -1;
         }
 
@@ -45,29 +51,26 @@ class STACK{
 
         virtual ~STACK(){
             maxCapacity = 0;
-            N = -1;
-            if(this->s){
-                delete[] s;
-            }
+            this->N  = -1;
         }
 
-        STACK& operator=(const STACK<Item>& cpyAssObj){
-            if(this->s){
-                delete[] this->s;
-            }
-            this->maxCapacity = cpyAssObj.maxCapacity;
-            this->s = new Item[maxCapacity];
-            this->N  = cpyAssObj.N;
-            std::copy(cpyAssObj.s, cpyAssObj.s + cpyAssObj.N, this->s);
-            return *this;
-        }
+        // STACK& operator=(const STACK<Item>& cpyAssObj){
+        //     if(this->s){
+        //         delete[] this->s;
+        //     }
+        //     this->maxCapacity = cpyAssObj.maxCapacity;
+        //     this->s = new Item[maxCapacity];
+        //     this->N  = cpyAssObj.N;
+        //     std::copy(cpyAssObj.s, cpyAssObj.s + cpyAssObj.N, this->s);
+        //     return *this;
+        // }
 
         STACK& operator=(STACK<Item>&& mvObject) noexcept{
             if(&mvObject == this)
                 return *this;
             maxCapacity = mvObject.maxCapacity;
             N = mvObject.N;
-            s = mvObject.s;
+            s = std::move(mvObject.s);
             mvObject.s = nullptr;
             mvObject.maxCapacity = mvObject.N = 0;
             return *this;

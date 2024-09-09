@@ -13,7 +13,7 @@ enum class HeapType{
 template <typename type_t>
 class Heap{
     private:
-        constexpr int SUB_TREE_SIZE 3;
+        #define SUB_TREE_SIZE 3
         std::vector<type_t> array;
         int64_t heapSize;
         HeapType type;
@@ -76,7 +76,7 @@ Heap<data_t>::Heap(std::vector<data_t>&& objArr, HeapType type){
 // initializer list constructor
 template <typename data_t>
 Heap<data_t>::Heap(std::initializer_list<data_t> list, HeapType type) : array(list){
-    this-> = list._M_len;
+    this->heapSize = list._M_len;
     this->type = type;
     this->printHeap();
     this->BuildHeap();
@@ -227,7 +227,7 @@ void Heap<data_t>::MinHeapify(int64_t i) noexcept{
     // array[i-1] holds that same property with respect to it's left and right children, but 
     // that check may invalidate one sub-tree, hence we recursively call it.
     if(i > 0 && i <= (this->heapSize >> 1)){
-        std::pair<type_t, int64_t> minElem = findMinIndex(i);
+        std::pair<data_t, int64_t> minElem = findMinIndex(i);
         if(minElem.second != i){
             std::swap(array[minElem.second-1], array[i-1]);
             MinHeapify(std::get<int64_t>(minElem));
