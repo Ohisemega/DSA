@@ -16,7 +16,6 @@ int Dynamic_KnapSack_sol(int **memoized, int index, int capacity, std::vector<in
         memoized[index][capacity] = Dynamic_KnapSack_sol(memoized, index - 1, capacity, value, cap);
         return memoized[index][capacity];
     }else{
-        memoized[index][capacity] = cap[index] + Dynamic_KnapSack_sol(memoized, index - 1, capacity - cap[index], value, cap);
         memoized[index][capacity] = std::max(Dynamic_KnapSack_sol(memoized, index - 1, capacity, value, cap), cap[index] + Dynamic_KnapSack_sol(memoized, index - 1, capacity - cap[index], value, cap));
         return memoized[index][capacity];
     }
