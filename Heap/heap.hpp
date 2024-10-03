@@ -34,14 +34,13 @@ class Heap{
         std::pair<type_t, bool> getElement(int64_t)const;
         std::pair<type_t&, bool> getElement(int64_t);
         void BuildHeap();
-        void InsertHeap(type_t insetElement);
         void HeapIncreaseKey(int indx)noexcept;
         void HeapDecreaseKey(int indx)noexcept;
 
     public:
+        Heap()=delete;
         explicit Heap(std::vector<type_t>&&, HeapType = HeapType::MAX_HEAP);
         Heap(std::initializer_list<type_t>, HeapType = HeapType::MAX_HEAP);
-        Heap(size_t heapSize, HeapType = HeapType::MAX_HEAP);
         Heap(const Heap<type_t>&) =delete; // conversion operator
         Heap<type_t>& operator=(const Heap<type_t>&) =delete;  // copy assignment operator deleted
         Heap(Heap<type_t>&&)noexcept; // move constructor
@@ -50,6 +49,7 @@ class Heap{
         void configureHeapType(HeapType type);
         void MaxHeapSort();
         void MinHeapSort();
+        void InsertHeap(type_t insetElement);
         void HeapDeleteElement(int64_t i);
         void printHeap() const;
 };
@@ -62,14 +62,12 @@ void Heap<data_t>::printHeap()const{
     std::cout << std::endl;
 }
 
-
-
 template <typename data_t>
 Heap<data_t>::Heap(std::vector<data_t>&& objArr, HeapType type){
     this->heapSize = objArr.size();
     this->array = std::move(objArr);
     this->type = type;
-    this->printHeap();
+    // this->printHeap();
     this->BuildHeap();
 }
 
@@ -78,7 +76,7 @@ template <typename data_t>
 Heap<data_t>::Heap(std::initializer_list<data_t> list, HeapType type) : array(list){
     this->heapSize = list._M_len;
     this->type = type;
-    this->printHeap();
+    // this->printHeap();
     this->BuildHeap();
 }
 
@@ -191,7 +189,7 @@ std::pair<int64_t, bool> Heap<data_t>::Parent(int64_t i) const{
 
 template <typename data_t>
 std::pair<int64_t, bool> Heap<data_t>::LeftChild(int64_t i) const{
-    if((i > 0) && (i < ((this->heapSize >> 1) + 1)) && (2*i) < this->heapSize){
+    if((i > 0) && (i < ((this->heapSize >> 1) + 1)) && (2*i) <= this->heapSize){
         return std::make_pair(2*i, true);     
     }
     return {i, false};
@@ -199,7 +197,7 @@ std::pair<int64_t, bool> Heap<data_t>::LeftChild(int64_t i) const{
 
 template <typename data_t>
 std::pair<int64_t, bool> Heap<data_t>::RightChild(int64_t i) const{
-    if((i >= 1) && (i < ((this->heapSize >> 1) + 1)) && ((2*i)+1) < this->heapSize){
+    if((i >= 1) && (i < ((this->heapSize >> 1) + 1)) && ((2*i)+1) <= this->heapSize){
         return std::make_pair((2*i) + 1, true);     
     }
     return {i, false};
@@ -252,13 +250,18 @@ template <typename data_t>
 void Heap<data_t>::InsertHeap(data_t insertElement){
     array.push_back(insertElement);
     ++this->heapSize;
-    this-BuildHeap();    
+    this->BuildHeap();
+    // this->MaxHeapify(this->heapSize >> 1);
+    // int64_t i = this->heapSize;
+    // while(i > 0 && this->array[(i-1)/2] < this->array[i-1]){
+    //     std::swap(this->array[(i-1)/2], this->array[i-1]);
+    //     i >>= 1;
+    // }
 }
 
 // heap-sort is about sorting the internal array, not the heap itself
 template<typename data_t>
 void Heap<data_t>::MaxHeapSort(){
-    this->BuildHeap();
     for (;this->heapSize > 1;){
         std::swap(array[0], array[heapSize-1]);
         this->printHeap();
@@ -271,7 +274,6 @@ void Heap<data_t>::MaxHeapSort(){
 // heap-sort is about sorting the internal array, not the heap itself
 template<typename data_t>
 void Heap<data_t>::MinHeapSort(){
-    this->BuildHeap();
     for (;this->heapSize > 1; --this->heapSize){
         std::swap(array[0], array[heapSize-1]); 
         MinHeapify(1); // keep the minimum at the root of the tree, preserve min-heap property
