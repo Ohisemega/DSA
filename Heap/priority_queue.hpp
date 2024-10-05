@@ -25,6 +25,11 @@ struct Pobject{
     bool operator==(const Pobject<data_t>& obj) const noexcept{
         return this->key == obj.key;
     }
+
+    Pobject<data_t>& operator=(const Pobject<data_t>& obj) const noexcept{
+        return this->key = obj.key;
+    }
+
     private:
         int key;
         data_t data;
@@ -43,8 +48,8 @@ class PriorityQueue : public Heap<Pobject<type_t>>{
         std::pair<type_t, bool> ExtractMax();
         std::pair<type_t, bool> ExtractMin();
         void HeapDeleteElement(int64_t i);
-        bool IncreaseKey(int indx, int key);
-        bool DecreaseKey(int indx, int key);
+        bool IncreaseKey(Pobject<type_t> obj, int key);
+        bool DecreaseKey(Pobject<type_t> obj, int key);
         HeapType getPriorityQueueType() const noexcept; 
 };
 
@@ -76,38 +81,30 @@ template<typename data_t>
 std::pair<data_t, bool> PriorityQueue<data_t>::ExtractMax(){
     auto obj = Heap<Pobject<data_t>>::getElement(1);
     Heap<data_t>::HeapDeleteElement(1);
-    return std::make_pair(obj.first.data, obj.second);
+    return obj;
 }
 
 template<typename data_t>
 std::pair<data_t, bool> PriorityQueue<data_t>::ExtractMin(){
     auto obj = Heap<Pobject<data_t>>::getElement(1);
-    Heap<data_t>::HeapDeleteElement(1);
-    return std::make_pair(obj.first.data, obj.second);
+    Heap<Pobject<data_t>>::HeapDeleteElement(1);
+    return obj;
 }
 
 template<typename data_t>
-bool PriorityQueue<data_t>::IncreaseKey(int indx, int key){
+bool PriorityQueue<data_t>::IncreaseKey(Pobject<data_t> obj, int key){
     bool ret = false;
-    if(Heap<Pobject<data_t>>::getElement(indx).second && Heap<Pobject<data_t>>::getElement(indx) > Pobject<data_t>(key) && Heap<Pobject<data_t>>::getHeapType() == HeapType::MAX_HEAP){
-        Pobject<data_t> temp{Heap<Pobject<data_t>>::getElement(indx)};
-        temp.key = key;
-        Heap<Pobject<data_t>>::getElement(indx) = temp;
-        Heap<Pobject<data_t>>::HeapIncreaseKey(indx);
-        ret = true;
+    if(obj < Pobject<data_t>(key) && Heap<Pobject<data_t>>::getHeapType() == HeapType::MAX_HEAP){
+        ret = Heap<Pobject<data_t>>::changeElement(obj, Pobject<data_t>(obj.data, key));
     }
     return ret;
 }
 
 template<typename data_t>
-bool PriorityQueue<data_t>::DecreaseKey(int indx, int key){
+bool PriorityQueue<data_t>::DecreaseKey(Pobject<data_t> obj, int key){
     bool ret = false;
-    if(Heap<Pobject<data_t>>::getElement(indx).second && Heap<Pobject<data_t>>::getElement(indx) < Pobject<data_t>(key) && Heap<Pobject<data_t>>::getHeapType() == HeapType::MIN_HEAP){
-        Pobject<data_t> temp{Heap<Pobject<data_t>>::getElement(indx)};
-        temp.key = key;
-        Heap<Pobject<data_t>>::getElement(indx) = temp;
-        Heap<Pobject<data_t>>::HeapDecreaseKey(indx);
-        ret = true;
+    if(obj > Pobject<data_t>(key) && Heap<Pobject<data_t>>::getHeapType() == HeapType::MIN_HEAP){
+        ret = Heap<Pobject<data_t>>::changeElement(obj, Pobject<data_t>(obj.data, key));
     }
     return ret;
 }

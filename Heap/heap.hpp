@@ -10,6 +10,11 @@ enum class HeapType{
     MIN_HEAP,
 };
 
+/*The Policy of our heap implementation is that:
+    ONLY when we access the array do we utilize the 
+    index - 1 property because we transform an example array
+    given as: 0, 1, 2, 3 --> 1, 2, 3, 4*/
+
 template <typename type_t>
 class Heap{
     private:
@@ -34,8 +39,7 @@ class Heap{
         std::pair<type_t, bool> getElement(int64_t)const;
         std::pair<type_t&, bool> getElement(int64_t);
         void BuildHeap();
-        void HeapIncreaseKey(int indx)noexcept;
-        void HeapDecreaseKey(int indx)noexcept;
+        bool changeElement(type_t data, type_t new_data) const noexcept;
 
     public:
         Heap()=delete;
@@ -290,23 +294,26 @@ void Heap<data_t>::HeapDeleteElement(int64_t i){
 }
 
 template <typename data_t>
-void Heap<data_t>::HeapIncreaseKey(int indx)noexcept{
-    if(this->type == HeapType::MAX_HEAP && indx > 1 && indx <= this->heapSize){
-        while (indx > 1 && (array[this->Parent(indx)-1] < this->array[indx-1])){
-            std::swap(array[this->Parent(indx)-1], array[indx-1]);
-            indx = this->Parent(indx);
+bool Heap<data_t>::changeElement(data_t data, data_t new_data) const noexcept{
+    bool ret = false;
+    int64_t indx;
+    for(int i = 0; i < this->heapSize; ++i){
+        if(data == this->array[i]){
+            ret = true;
+            indx = i;
+            ++indx;
+            break;
         }
     }
-}
-
-template <typename data_t>
-void Heap<data_t>::HeapDecreaseKey(int indx)noexcept{
-    if(this->type == HeapType::MIN_HEAP && indx > 1 && indx <= this->heapSize){
-        while (indx > 1 && (array[this->Parent(indx)-1] > this->array[indx-1])){
-            std::swap(array[this->Parent(indx)-1], array[indx-1]);
-            indx = this->Parent(indx);
-        }
+    if(ret){
+        data[indx-1] = new_data;
+        this->BuildHeap();
+        // while(indx > 0 && this->array[(indx-1)/2] < this->array[indx-1]){
+        //     std::swap(this->array[(indx-1)/2], this->array[indx-1]);
+        //     indx >>= 1;
+        // }
     }
+    return ret;
 }
 
 #endif
