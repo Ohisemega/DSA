@@ -9,6 +9,7 @@ struct Pobject{
         key = -1;
     }
     Pobject(int key){
+        static_assert(std::is_default_constructible<data_t>::value, "Class Heap data specialization is NOT default constructible!");
         this->key = key;
     }
     Pobject(data_t data, int key){
@@ -48,8 +49,8 @@ class PriorityQueue : public Heap<Pobject<type_t>>{
         std::pair<type_t, bool> ExtractMax();
         std::pair<type_t, bool> ExtractMin();
         void HeapDeleteElement(int64_t i);
-        bool IncreaseKey(Pobject<type_t> obj, int key);
-        bool DecreaseKey(Pobject<type_t> obj, int key);
+        bool IncreaseKey(int old_key, int new_key);
+        bool DecreaseKey(int old_key, int new_key);
         HeapType getPriorityQueueType() const noexcept; 
 };
 
@@ -92,19 +93,19 @@ std::pair<data_t, bool> PriorityQueue<data_t>::ExtractMin(){
 }
 
 template<typename data_t>
-bool PriorityQueue<data_t>::IncreaseKey(Pobject<data_t> obj, int key){
+bool PriorityQueue<data_t>::IncreaseKey(int old_key, int key){
     bool ret = false;
-    if(obj < Pobject<data_t>(key) && Heap<Pobject<data_t>>::getHeapType() == HeapType::MAX_HEAP){
-        ret = Heap<Pobject<data_t>>::changeElement(obj, Pobject<data_t>(obj.data, key));
+    if(Pobject<data_t>(old_key) < Pobject<data_t>(key) && Heap<Pobject<data_t>>::getHeapType() == HeapType::MAX_HEAP){
+        ret = Heap<Pobject<data_t>>::changeElement(Pobject<data_t>(old_key), Pobject<data_t>(obj.data, key));
     }
     return ret;
 }
 
 template<typename data_t>
-bool PriorityQueue<data_t>::DecreaseKey(Pobject<data_t> obj, int key){
+bool PriorityQueue<data_t>::DecreaseKey(int old_key, int key){
     bool ret = false;
-    if(obj > Pobject<data_t>(key) && Heap<Pobject<data_t>>::getHeapType() == HeapType::MIN_HEAP){
-        ret = Heap<Pobject<data_t>>::changeElement(obj, Pobject<data_t>(obj.data, key));
+    if(Pobject<data_t>(old_key) > Pobject<data_t>(key) && Heap<Pobject<data_t>>::getHeapType() == HeapType::MIN_HEAP){
+        ret = Heap<Pobject<data_t>>::changeElement(Pobject<data_t>(old_key), Pobject<data_t>(obj.data, key));
     }
     return ret;
 }
