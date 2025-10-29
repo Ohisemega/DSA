@@ -254,7 +254,19 @@ template <typename data_t>
 void Heap<data_t>::InsertHeap(data_t insertElement){
     array.push_back(insertElement);
     ++this->heapSize;
-    this->BuildHeap();
+    int i = heapSize;
+    // this->BuildHeap();
+    if(this->type == HeapType::MAX_HEAP){
+        while(i > 1 && array[i/2] < array[i]){
+            std::swap(array[i], array[i/2]);
+            i >>= 1;
+        }
+    }else{
+        while(i > 1 && array[i/2] > array[i]){
+            std::swap(array[i], array[i/2]);
+            i >>= 1;
+        }
+    }
     // this->MaxHeapify(this->heapSize >> 1);
     // int64_t i = this->heapSize;
     // while(i > 0 && this->array[(i-1)/2] < this->array[i-1]){
@@ -287,7 +299,7 @@ void Heap<data_t>::MinHeapSort(){
 template<typename data_t>
 void Heap<data_t>::HeapDeleteElement(int64_t i){
     if(i > 0 && i <= this->heapSize){
-        array[i-1] = array[heapSize-1];
+        std::swap(array[i-1], array[heapSize-1]);
         --this->heapSize;
         this->type == HeapType::MAX_HEAP ? this->MaxHeapify(i) : this->MinHeapify(i);
     }

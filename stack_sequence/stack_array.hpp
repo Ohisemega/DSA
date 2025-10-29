@@ -2,7 +2,6 @@
 #define STACK_ARRAY_HPP
 #include <cstdint>
 #include <utility>
-#include <algorithm>
 #include <memory>
 #include <iostream>
 #include <stdexcept>

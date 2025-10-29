@@ -12,6 +12,8 @@ int max_tree_depth_recursive(Tree* root){
 }
 
 
+// This uses a BFS algorithm to find the height of the tree
+// We use a 'nullptr' to demacate each level
 int max_tree_depth_iterative(Tree* node){
     std::queue<Tree*> que;
     Tree* current = node;

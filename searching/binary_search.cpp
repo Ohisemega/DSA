@@ -22,7 +22,7 @@ std::pair<Item, bool> bsearch(std::vector<Item>& vec, Item key){
 
 
 int main(){
-    std::vector<int> vect = {1, 2, 3, 4, 5, 7, 9, 11, 15, 20, 21, 45, 89, 100, 1105, 106, 107};
+    std::vector<int> vect = {1, 2, 3, 4, 5, 7, 9, 11, 15, 15, 20, 21, 45, 89, 100, 1105, 106, 107};
 
     std::cout << std::boolalpha << "Presence of the number 0 is: " << bsearch(vect, 0).second << "\n";
     std::cout << std::boolalpha << "Presence of the number 15 is: " << bsearch(vect, 15).second << "\n";
