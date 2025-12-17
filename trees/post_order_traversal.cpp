@@ -4,8 +4,8 @@
 
 void PostOrder_traversal_recursive(Tree* root){
     if(root != nullptr){
-        PostOrder_traversal_recursive(root->left);
-        PostOrder_traversal_recursive(root->right);
+        if(root->left) PostOrder_traversal_recursive(root->left);
+        if(root->right) PostOrder_traversal_recursive(root->right);
         visit(root);
     }
 }
@@ -40,7 +40,7 @@ void PostOrder_traversal_iterative(Tree* root){
                 visit(stck.top());
                 stck.pop();
             }
-            current = stck.top()->right;
+            current = stck.top()->right; // this should set current as null here
         }
     }
 }

@@ -5,8 +5,8 @@
 void PreOrder_trvaersal_recursive(Tree* root){
     if(root != nullptr){
         visit(root);
-        PreOrder_trvaersal_recursive(root->left);
-        PreOrder_trvaersal_recursive(root->right);
+        if(root->left) PreOrder_trvaersal_recursive(root->left);
+        if(root->right) PreOrder_trvaersal_recursive(root->right);
     }
 }
 

@@ -4,9 +4,9 @@
 
 void InOrder_traversal_recursive(Tree* root){
     if(root != nullptr){
-        InOrder_traversal_recursive(root->left);
+        if(root->left) InOrder_traversal_recursive(root->left);
         visit(root);
-        InOrder_traversal_recursive(root->right);
+        if(root->right) InOrder_traversal_recursive(root->right);
     }
 }
 
@@ -54,7 +54,7 @@ Tree* Inorder_successor(Tree* root, int targ_key){
 		key = current->val;
 		if(targ_key < key){
 			prev_left_parent = current;
-			curent = current->left;
+			current = current->left;
 		}else if (targ_key > key){
 			current  = current->right;
 		}else{
