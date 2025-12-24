@@ -25,12 +25,12 @@
  * And A and B will be counted as separate "connected components"
  */
 
-
 #include "graph.h"
+void BFS_traversal(Graph& G, int);
 void connected_components(Graph& G) {
     int components = 0;
     
-    for (int i = 0; i < G.vertices(); ++i){
+    for (int i = 1; i < G.vertices(); ++i){
         if(G.states[i] == NodeState::UNDISCOVERED){
             ++components;
             std::cout << "Component Count: " << components << '\n';
