@@ -1,18 +1,7 @@
 #include "graph.h"
-
-enum class NodeState{
-    UNDISCOVERED = 0,
-    DISCOVERED = 2,
-    PROCESSED = 4,
-};
-
-#include <array>
 #include <queue>
 
-std::array<NodeState, MAX+1> states;
-std::array<int, MAX+1> parents;
-
-void process_node_early(int node){
+void process_node_early(int node) {
     std::cout << "Processed Node is: " << node << '\n';
 }
 
@@ -27,19 +16,19 @@ void BFS_traversal(Graph& G, Root vtx) {
     while(!Qu.empty()) {
         int top = Qu.front();
         Qu.pop();
-        states[top] = NodeState::DISCOVERED;
+        G.states[top] = NodeState::DISCOVERED;
         process_node_early(top);
 
         for(edgeNode* itr = G.getList()[top]; itr != nullptr; itr = itr->next) {
-            if(states[itr->y] == NodeState::UNDISCOVERED) {
-                states[itr->y] = NodeState::DISCOVERED;
-                parents[itr->y] = top;
+            if(G.states[itr->y] == NodeState::UNDISCOVERED) {
+                G.states[itr->y] = NodeState::DISCOVERED;
+                G.parents[itr->y] = top;
                 Qu.push(itr->y);
-            }else if(states[itr->y] != NodeState::PROCESSED) {
+            }else if(G.states[itr->y] != NodeState::PROCESSED) {
                 process_edge(top, itr->y);
             }
         }
-        states[top] = NodeState::PROCESSED;
+        G.states[top] = NodeState::PROCESSED;
 
     }
 }

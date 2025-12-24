@@ -1,6 +1,12 @@
 #include <iostream>
 #include <array>
 #define MAX 200
+
+enum class NodeState{
+    UNDISCOVERED,
+    DISCOVERED,
+    PROCESSED
+};
 // An Adjacency Graph Implementation!
 typedef struct edgeNode{
     int y;  // ID of this NODE!!!
@@ -17,6 +23,8 @@ typedef struct Graph{
             this->degree[i] = 0;
             this->adjacentNodesListArray[i] = NULL;
         }
+        states.fill(NodeState::UNDISCOVERED);
+        parents.fill(-1);
     }
     void read_graph() {
         int edgeCount;
@@ -42,6 +50,9 @@ typedef struct Graph{
     std::array<edgeNode*, MAX+1> getList() const{
         return adjacentNodesListArray;
     }
+    
+    std::array<NodeState, MAX+1> states;
+    std::array<int, MAX+1> parents;
     private:
         bool directed; // Is the graph directed or undirected. This will influence how we add edges (reciprocal/nor reciprocal: x-y: x has an edge to y, does y have an edge to x??)
         int nedges; // current number of vertices currently in the graph
