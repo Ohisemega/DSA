@@ -40,7 +40,6 @@ typedef struct Graph{
             this->insert_edge(x, y);
             ++degree[x];
             ++nedges;
-            nvertices += 2;
             if(!directed){
                 ++degree[y];
                 this->insert_edge(y, x);
@@ -50,7 +49,15 @@ typedef struct Graph{
     std::array<edgeNode*, MAX+1> getList() const{
         return adjacentNodesListArray;
     }
-    
+
+    int vertices() const {
+        return nvertices;
+    }
+
+    int edges() const{
+        return nedges;
+    }
+
     std::array<NodeState, MAX+1> states;
     std::array<int, MAX+1> parents;
     private:

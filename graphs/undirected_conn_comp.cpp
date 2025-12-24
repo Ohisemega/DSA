@@ -30,5 +30,12 @@
 void connected_components(Graph& G) {
     int components = 0;
     
-    for ()
+    for (int i = 0; i < G.vertices(); ++i){
+        if(G.states[i] == NodeState::UNDISCOVERED){
+            ++components;
+            std::cout << "Component Count: " << components << '\n';
+            BFS_traversal(G, i);
+            std::cout << '\n';
+        }
+    }
 }
