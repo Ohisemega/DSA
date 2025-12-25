@@ -10,7 +10,7 @@ enum class NodeState{
 // An Adjacency Graph Implementation!
 typedef struct edgeNode{
     int y;  // ID of this NODE!!!
-    int weight;
+    int weight; // Weight of this edge if any
     struct edgeNode* next;
 }edgeNode;
 
@@ -59,6 +59,10 @@ typedef struct Graph{
 
     int edges() const{
         return nedges;
+    }
+
+    bool is_directed() const{
+        return directed;
     }
 
     std::array<NodeState, MAX+1> states;
