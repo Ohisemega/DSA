@@ -32,6 +32,9 @@ typedef struct Graph{
         std::cout << "Enter the number of Edges: ";
         std::cin >> edgeCount;
         std::cout << '\n';
+        std::cout << "Enter the number of Vertices: ";
+        std::cin >> nvertices;
+        std::cout << '\n';
         for (int i = 1; i < edgeCount; ++i) {
             std::cin >> x;
             std::cout << ' ';
