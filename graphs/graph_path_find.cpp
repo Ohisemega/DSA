@@ -12,8 +12,8 @@ void find_path(NodeID start, NodeID end, NodeID parents[]) {
     if(start == end || start == -1) {
         std::cout << '\n' << start << '\n';
     }else{
-        find_path(start, parents[end], parent);
-        std::cout << '\n' << parents[end] << '\n';
+        find_path(start, parents[end], parents);
+        std::cout << '\n' << end << '\n';
     }
 
 }
