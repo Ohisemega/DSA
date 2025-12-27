@@ -76,10 +76,16 @@ typedef struct Graph{
         void insert_edge(int x, int y) {
             edgeNode *p = nullptr;
             p = new edgeNode{y, 0, adjacentNodesListArray[x]};
+            adjacentNodesListArray[x] = p;
+            ++degree[x];
+            ++this->nedges;
+            if(!directed){
+                insert_edge(y, x);
+            }
         }
 } Graph;
 
-// The nvertices and
-// nedges count are actually statistical metrics fir an object of this class/struct.
+// The  nvertices and
+//      nedges count are actually statistical metrics fir an object of this class/struct.
 // They are good for fast query but not utilized directly by algorithms working on this DS
 
