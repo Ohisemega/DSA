@@ -79,15 +79,18 @@ void DFS_traversal(Graph& G, int Root, bool& is_cycle ){
         time_cnt++;
         int top = stk.top();
         stk.pop();
-        if(top >= 0) {
+        if(top >= 0) { // If the NODE_ID is a positive number (1 to infinity) this is a normal node ID, else it is a sentinel 
+            if(G.states[top] == NodeState::PROCESSED) continue; // If the node state is processed, skip everything!
             entry_time[top] = time_cnt;
         }else{ // We use -top as a sentinel to signal that we have iterated through all the nodes in the adjacency list of NODE: top.
+               // This also marks when we can finally do the process_node_late call for each node iterated through!
             // A similar sentinel can be used in BFS-traversal and when the sentinel is met, we can calculate the height of a BFS-Traversal tree or an actual TREE data structure!
             exit_time[top*(-1)] = time_cnt;
+            process_node_late(G, top*(-1));
+            G.states[top*(-1)] = NodeState::PROCESSED;
             continue;
         }
         
-        if(G.states[top] == NodeState::PROCESSED) continue;
         process_node_early(G, top);
         for(itr = G.getList()[top]; itr != nullptr; itr = itr->next) {
             if(G.states[itr->y] == NodeState::UNDISCOVERED){
@@ -105,8 +108,6 @@ void DFS_traversal(Graph& G, int Root, bool& is_cycle ){
         }
         stk.push(-top);
         vec.clear();
-        process_node_late(G, top);
-        G.states[top] = NodeState::PROCESSED;
     }
 }
 
