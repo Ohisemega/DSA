@@ -51,7 +51,7 @@ void DFS_module_init(){
 
 /** If We want to Run an algorithm which iteratively removes each node piece from this graph and tests for connected components
  * We can achieve this by setting the linked-list index in the adjacency array of vertices to 0. That way When the DFS algorithm tries to DFS to
- * that node, it meets a nullptr entry! Assuming the GRAPH was originally FULLY-CONNECTED-COMPONENT
+ * that node, it meets a nullptr entry! Assuming the GRAPH was originally FULLY-CONNECTED-COMPONENT.
  * for(int i = 1; i < G.vertices(); ++i) {
  *      edgeNode* cache = G.getList()[i];
  *      G.getList()[i] = nullptr;
@@ -94,10 +94,10 @@ void DFS_traversal(Graph& G, int Root, bool& is_cycle ){
                 G.states[itr->y] = NodeState::DISCOVERED;
                 G.parents[itr->y] = top; // TREE-EDGE
                 vec.push_back(itr->y);
-                process_edge_early(top, itr->y); // do we want to process the edge early?!!
+                process_edge(top, itr->y); // do we want to process the edge early?!!
             }else if((G.states[itr->y] == NodeState::DISCOVERED && G.parents[itr->y] != top/*BACK-EDGE*/) || G.is_directed()) {
-                process_edge_late(top, itr->y);
                 if(G.states[itr->y] == NodeState::DISCOVERED && G.parents[top] != itr->y) is_cycle = true; // This Graph HAS A CYCLE!
+                process_edge(top, itr->y);
             }
         }
         for(int i = vec.size()-1; i >= 0; --i) {
@@ -124,7 +124,7 @@ void DFS_traversal_rec(Graph& G, int Root, bool& is_cycle) {
             process_edge_early(Root, itr->y);
         }else if((G.states[itr->y] != NodeState::PROCESSED && G.parents[Root] != itr->y) || (G.is_directed())){
             is_cycle = process_edge_cycle_search(Root, itr->y, G.parents);
-            process_edge_late(Root, itr->y);
+            process_edge(Root, itr->y);
         }
         itr = itr->next;
     }
@@ -188,9 +188,13 @@ void process_edge(Graph& G, int parent, int child) {
     }
 }
 
-/** This algorithm is run when a DF is unwinding the call stack that is associated with a node in the recursive version
- * In the iterative version, it is when the for-loop of the adjacency list of a node encounters the negative  ID of a node
+/** This algorithm is run when a DFS is unwinding the call stack that is associated with a node in the recursive version
+ * In the iterative version, it is when the for-loop of the adjacency list of a node has completed!
  * i.e. a sentinel for when all the UNDISCOVERED child-nodes/TREE-EDGES of a parent have been added to the stack Data Structure
+ *
+ * For every node which process_node_late runs on, it's child-node (if any) has updated it's reachable_ancestor[node]
+ * This is the last statement of every process_node_late(...) method - which the child runs on unwinding it's stack (occurs before 
+ *  parent node's call stack unwinds)!
  */
 void process_node_late(Graph& G, int node) {
     bool root;
@@ -209,7 +213,10 @@ void process_node_late(Graph& G, int node) {
                                              // Here we are checking if The parent of the node - G.parents[node] is the ROOT_NODE itself
                                              // i.e. if the parent of the parent of node is the ROOT_NODE itself!
     if(!root) {
-        if(reachable_ancestor[node] == G.parents[node]) { // This should not be possible no?
+        if(reachable_ancestor[node] == G.parents[node]) { // This is possible if it's child node in the DFS-Traversal tree update it's reachable ancestor to be this node's parent!
+                                                          // Imagine a section of the DFS-Traversal tree's path is: A ---> B ---> C 
+                                                          //                                                        |____<________|
+                                                          // With a BACK_EDGE from C to A, so C will unwind and update B's reachable_ancestor[B] == A!
             std::cout << "Parent Articulation Vertex! " << G.parents[node] << '\n';
             articulation_vertices.push_back(G.parents[node]);
         }else if(reachable_ancestor[node] == node) {
@@ -225,7 +232,8 @@ void process_node_late(Graph& G, int node) {
     time_node = entry_time[reachable_ancestor[node]];
     time_parent = entry_time[reachable_ancestor[G.parents[node]]];
 
-    if(time_node < time_parent) {
+    if(time_node < time_parent) { // Update node's parent's reachable ancestor if node has one more ancient than parent's!
+                                  // Remember that DFS-traversal will next call this function on node's parent!
         reachable_ancestor[G.parents[node]] = reachable_ancestor[node];
     }
 }
