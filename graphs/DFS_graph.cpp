@@ -20,13 +20,14 @@
  *  But in using a stack, we push the first UNDISCOVERED
  *  node to the bottom of the stack. To mimic the Recursion
  *  model, we actually want to visit the node at the bottom
- *  of the STACK! Hence, we can use a DEQUEUE, and access the 
- *  oldest element on the QUEUE/DEQUE rather that the recently 
- *  pushed one allowed by the STACK data structure!
+ *  of the STACK!
+ *  In my implementation, I used a vector first to store all UNDISCOVERED
+ *  VERTICES, then pushed them in the reverse order (end-to-beginning)
+ *  into a STACK DS. So we have the first DISCOVERD at the top of the 
+ *  STACK! 
  */
 #include "graph.h"
 #include <stack>
-#include <deque>
 #include <vector>
 
 void process_node_early(Graph& G, int node);
@@ -36,9 +37,36 @@ bool process_edge_cycle_search(int start, int end, std::array<int, MAX+1>& paren
 std::array<int, MAX+1> entry_time;
 std::array<int, MAX+1> exit_time;
 std::array<int, MAX+1> reachable_ancestor;
-std::array<int, MAX+1> tree_node_degree; /*This is an array that stores the number of TREE-EDGES each node in a GRAPH has during a DFS-Tree generation from some arbitrary root!*/
+std::array<int, MAX+1> tree_node_degree; /*This is an array that stores the number of TREE-EDGES each node in a GRAPH has during a DFS-Traversal-Tree generation from some arbitrary root!*/
 static int time_cnt = 0;
+std::vector<int> articulation_vertices;
 
+void DFS_module_init(){
+    entry_time.fill(-1);
+    exit_time.fill(-1);
+    reachable_ancestor.fill(-1);
+    tree_node_degree.fill(0);
+    articulation_vertices.clear();
+}
+
+/** If We want to Run an algorithm which iteratively removes each node piece from this graph and tests for connected components
+ * We can achieve this by setting the linked-list index in the adjacency array of vertices to 0. That way When the DFS algorithm tries to DFS to
+ * that node, it meets a nullptr entry! Assuming the GRAPH was originally FULLY-CONNECTED-COMPONENT
+ * for(int i = 1; i < G.vertices(); ++i) {
+ *      edgeNode* cache = G.getList()[i];
+ *      G.getList()[i] = nullptr;
+ *      if(i == 1) DFS_traversal(G, i++, is_cycle)
+ *      else DFS_traversal(G, 1, is_cycle);
+ *      G.getList()[i] = cache;
+ *      for(i = 1; i < G.vertices(); i++) {
+ *          if(G.states[i] == NodeState::UNDISCOVERED){
+ *              std::cout << i << " is an ARTICULATION vertex!\n";
+ *              break;
+ *          }
+ *      }
+ *
+ * }
+ */
 void DFS_traversal(Graph& G, int Root, bool& is_cycle ){
     std::stack<int> stk;
     std::vector<int> vec;
@@ -53,7 +81,8 @@ void DFS_traversal(Graph& G, int Root, bool& is_cycle ){
         stk.pop();
         if(top >= 0) {
             entry_time[top] = time_cnt;
-        }else{
+        }else{ // We use -top as a sentinel to signal that we have iterated through all the nodes in the adjacency list of NODE: top.
+            // A similar sentinel can be used in BFS-traversal and when the sentinel is met, we can calculate the height of a BFS-Traversal tree or an actual TREE data structure!
             exit_time[top*(-1)] = time_cnt;
             continue;
         }
@@ -123,6 +152,9 @@ bool process_edge_cycle_search(int start, int end, std::array<int, MAX+1>& paren
     return true;
 }
 
+/** process_nodde_early simply sets the reachable_ancestor
+ * of any node o be itself!
+ */
 void process_node_early(int node) {
     reachable_ancestor[node] = node; // Initially, All nodes are set to be reachable to only themselves by setting 
                                      // reachable_ancestor[node] = node;
@@ -134,7 +166,7 @@ void process_node_early(int node) {
  * NODE.
  * The purpose of process_node_early() is simply to
  * Get the EDGE's classification - TREE_EDGE/BACK_EDGE
- * if TREE_EDGE: Increment the tree_node_degree for the DFS-Traversal tree of the GRAPH
+ * if TREE_EDGE: Increment the tree_node_degree entry for the DFS-Traversal tree of the GRAPH
  * if EDGE_NODE: Check if y is x's parent, if not, check the earliest ancestor of x! and update the ancestor if y is earlier than x's current earliest ancestor
  *               Do this by checking entry_time[y] is < entry_time[reachable_ancestor[x]]; if so, update reachable_ancestor[x] = y;
  */
@@ -143,10 +175,12 @@ void process_edge(Graph& G, int parent, int child) {
 
     if(eclass == EdgeClass::TREE_EDGE) {
         ++tree_node_degree[parent]; // The Tree Edge from the Parent--to-->Child. Here, the Child was in an UNDISCOVERED state, and the Parent is it's direct ancestor automatically!
+        // Hence, the parent has a TREE_EDGE going out to the child in the DFS-Traversal and that is one more node_degree for the parent!
     }
 
     if(eclass == EdgeClass::BACK_EDGE && (G.parents[parent] != child)) {
         // Remember that the child is the parent's ancestor in this case
+        // The reachable ancestor is first update when we process_edge(parent, child) and the edge is a BACK_EDGE!
         if(entry_time[child] < entry_time[reachable_ancestor[parent]]) { // If the entry_time[child] is earlier than the entry_time[parent's current reachable ancestor]:
                                                                          // Then we update the parent's reachable ancestor as we have an older one in view now!
             reachable_ancestor[parent] = child;
@@ -154,18 +188,44 @@ void process_edge(Graph& G, int parent, int child) {
     }
 }
 
+/** This algorithm is run when a DF is unwinding the call stack that is associated with a node in the recursive version
+ * In the iterative version, it is when the for-loop of the adjacency list of a node encounters the negative  ID of a node
+ * i.e. a sentinel for when all the UNDISCOVERED child-nodes/TREE-EDGES of a parent have been added to the stack Data Structure
+ */
 void process_node_late(Graph& G, int node) {
     bool root;
     int time_node;
     int time_parent;
-
-    if(G.parents[node] == -1) {
-        if(tree_node_degree[node] > 1) {
-            std::cout << "Root articulation vertex: " << node << '\n';
-        }
+    
+    // the parent of the ROOT node of DFS/BFS-Tree traversal is always -1! This will particularly hold once the node has been FULLY PROCESSED!
+    // All other nodes in the DFS/BFS-traversal Tre will have another node as a parent asides from the initial given node to iterate from!
+    if(G.parents[node] == -1 && tree_node_degree[node] > 1) { // If the node is the DFS-Traversal tree ROOT, then we check how many TREE-EDGES it has when we process process_edge(ROOT, SomeChild)...
+        // If the ROOT node of a DFS-traversal has more than 1 TREE-EDGE, then it is a Root Articulation!
+        std::cout << "Root articulation vertex: " << node << '\n';
         return;
     }
     
+    root = G.parents[G.parents[node]] == -1; // Remember (G.parents[NODE_ID] == -1) ===> means NODE_ID is the ROOT.
+                                             // Here we are checking if The parent of the node - G.parents[node] is the ROOT_NODE itself
+                                             // i.e. if the parent of the parent of node is the ROOT_NODE itself!
+    if(!root) {
+        if(reachable_ancestor[node] == G.parents[node]) { // This should not be possible no?
+            std::cout << "Parent Articulation Vertex! " << G.parents[node] << '\n';
+            articulation_vertices.push_back(G.parents[node]);
+        }else if(reachable_ancestor[node] == node) {
+            std::cout << "Bridge Articulation Vertex: " << node << '\n';
+            articulation_vertices.push_back(G.parents[node]);
 
-    
+            if(tree_node_degree[node] > 0) {
+                std::cout << "Bridge Articulation Vertex: " << node << '\n';
+                articulation_vertices.push_back(node);
+            }
+        }
+    }      
+    time_node = entry_time[reachable_ancestor[node]];
+    time_parent = entry_time[reachable_ancestor[G.parents[node]]];
+
+    if(time_node < time_parent) {
+        reachable_ancestor[G.parents[node]] = reachable_ancestor[node];
+    }
 }
