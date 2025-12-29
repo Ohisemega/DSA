@@ -16,7 +16,11 @@
  *  An edge between a parent and node is processed() when we 
  *  encounter a child in the adjacency list!
  *
- *  We use a STACK to simulate delayed computation,
+ *  We use two STACKs to simulate delayed computation,
+ *  The 1st stack was for simulating the recursive call to new nodes model
+ *  The 2nd stack was recording the access mode of nodes bottom to top
+ *  And we run a seperate while loop to Unwind the calls to each accessed node
+ *  marking them as PROCESSED!
  *  But in using a stack, we push the first UNDISCOVERED
  *  node to the bottom of the stack. To mimic the Recursion
  *  model, we actually want to visit the node at the bottom
@@ -69,6 +73,7 @@ void DFS_module_init(){
  */
 void DFS_traversal(Graph& G, int Root, bool& is_cycle ){
     std::stack<int> stk;
+    std::stack<int> unwind;
     std::vector<int> vec;
     vec.reserve(64);
     stk.push(Root);
@@ -78,18 +83,10 @@ void DFS_traversal(Graph& G, int Root, bool& is_cycle ){
     while(!stk.empty()) {
         time_cnt++;
         int top = stk.top();
+        unwind.push(top); // This STACK DS tracks the access mode of all nodes accessed from the DFS-traversal root to all leaves, and at the end of this while loop, we unpack this stack too!
         stk.pop();
-        if(top >= 0) { // If the NODE_ID is a positive number (1 to infinity) this is a normal node ID, else it is a sentinel 
-            if(G.states[top] == NodeState::PROCESSED) continue; // If the node state is processed, skip everything!
-            entry_time[top] = time_cnt;
-        }else{ // We use -top as a sentinel to signal that we have iterated through all the nodes in the adjacency list of NODE: top.
-               // This also marks when we can finally do the process_node_late call for each node iterated through!
-            // A similar sentinel can be used in BFS-traversal and when the sentinel is met, we can calculate the height of a BFS-Traversal tree or an actual TREE data structure!
-            exit_time[top*(-1)] = time_cnt;
-            process_node_late(G, top*(-1));
-            G.states[top*(-1)] = NodeState::PROCESSED;
-            continue;
-        }
+        if(G.states[top] == NodeState::PROCESSED) continue; // If the node state is processed, skip everything!
+        entry_time[top] = time_cnt;
         
         process_node_early(G, top);
         for(itr = G.getList()[top]; itr != nullptr; itr = itr->next) {
@@ -106,8 +103,20 @@ void DFS_traversal(Graph& G, int Root, bool& is_cycle ){
         for(int i = vec.size()-1; i >= 0; --i) {
             stk.push(vec[i]);
         }
-        stk.push(-top);
         vec.clear();
+    }
+    
+    // This step simulates unwinding the recursive call of the DF-traversal once we have 
+    // traversed the whole connected component of Root. We recorded the access mode in reverse 
+    // in the unwind STACK and simply popped it here while processing the nodes, and adding 
+    // exit time-stamps!
+    while(!unwind.empty()){
+        int unwind_node = unwind.top();
+        unwind.pop();
+        process_node_late(G, unwind_node);
+        time_cnt++;
+        exit_time[unwind_node] = time_cnt;
+        G.states[unwind_node] = NodeState::PROCESSED;
     }
 }
 
