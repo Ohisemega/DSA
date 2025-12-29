@@ -34,6 +34,7 @@
 #include <stack>
 #include <vector>
 
+void process_edge(Graph& G, int parent, int child);
 void process_node_early(Graph& G, int node);
 void process_node_late(Graph& G, int node);
 bool process_edge_cycle_search(int start, int end, std::array<int, MAX+1>& parents);
@@ -94,10 +95,14 @@ void DFS_traversal(Graph& G, int Root, bool& is_cycle ){
                 G.states[itr->y] = NodeState::DISCOVERED;
                 G.parents[itr->y] = top; // TREE-EDGE
                 vec.push_back(itr->y);
-                process_edge(top, itr->y); // do we want to process the edge early?!!
+                process_edge(G, top, itr->y); // do we want to process the edge early?!!
             }else if((G.states[itr->y] == NodeState::DISCOVERED && G.parents[itr->y] != top/*BACK-EDGE*/) || G.is_directed()) {
+                // We check for the condition of G.is_directed() because in a directed graph, each edge (NOT NODE) has one discovery chance!
+                // In a directed graph, top ----> itr->y is still a BACK_EDGE, but we will have no access to that EDGE if we ignore THIS case!
+                // If an edge leads from Node-top to a DISCOVERED node itr->y, it must be processed now or LOST!
+                // In an undirected graph, that is simply a BACK_EDGE and useful for identifying cycles or updating reachable_ancestor[] IDs 
                 if(G.states[itr->y] == NodeState::DISCOVERED && G.parents[top] != itr->y) is_cycle = true; // This Graph HAS A CYCLE!
-                process_edge(top, itr->y);
+                process_edge(G, top, itr->y);
             }
         }
         for(int i = vec.size()-1; i >= 0; --i) {
@@ -106,7 +111,7 @@ void DFS_traversal(Graph& G, int Root, bool& is_cycle ){
         vec.clear();
     }
     
-    // This step simulates unwinding the recursive call of the DF-traversal once we have 
+    // This step simulates unwinding the recursive call of the DFS-traversal once we have 
     // traversed the whole connected component of Root. We recorded the access mode in reverse 
     // in the unwind STACK and simply popped it here while processing the nodes, and adding 
     // exit time-stamps!
@@ -131,10 +136,10 @@ void DFS_traversal_rec(Graph& G, int Root, bool& is_cycle) {
             G.states[itr->y] = NodeState::DISCOVERED;
             G.parents[itr->y] = Root;
             DFS_traversal_rec(G, Root, is_cycle);
-            process_edge_early(Root, itr->y);
+            process_node_early(G, Root);
         }else if((G.states[itr->y] != NodeState::PROCESSED && G.parents[Root] != itr->y) || (G.is_directed())){
             is_cycle = process_edge_cycle_search(Root, itr->y, G.parents);
-            process_edge(Root, itr->y);
+            process_edge(G, Root, itr->y);
         }
         itr = itr->next;
     }
@@ -199,8 +204,8 @@ void process_edge(Graph& G, int parent, int child) {
 }
 
 /** This algorithm is run when a DFS is unwinding the call stack that is associated with a node in the recursive version
- * In the iterative version, it is when the for-loop of the adjacency list of a node has completed!
- * i.e. a sentinel for when all the UNDISCOVERED child-nodes/TREE-EDGES of a parent have been added to the stack Data Structure
+ * In the iterative version, it is called when the first while-loop has completed!
+ * We run another while-loop over an unwind STACK to simulate the recursive ature of popping call frames off the Program stack!
  *
  * For every node which process_node_late runs on, it's child-node (if any) has updated it's reachable_ancestor[node]
  * This is the last statement of every process_node_late(...) method - which the child runs on unwinding it's stack (occurs before 
@@ -233,7 +238,7 @@ void process_node_late(Graph& G, int node) {
             std::cout << "Bridge Articulation Vertex: " << node << '\n';
             articulation_vertices.push_back(G.parents[node]);
 
-            if(tree_node_degree[node] > 0) {
+            if(tree_node_degree[node] > 0) { // If node is NOT a LEAF_NODE i.e. it has tree_node_degree[node] > 0 (at least one child in the DFS-traversal tree)
                 std::cout << "Bridge Articulation Vertex: " << node << '\n';
                 articulation_vertices.push_back(node);
             }
