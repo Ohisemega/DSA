@@ -36,25 +36,26 @@ typedef struct Graph{
     void read_graph() {
         int edgeCount;
         int x, y;
+
         std::cout << "Enter the number of Edges: ";
         std::cin >> edgeCount;
-        std::cout << '\n';
         std::cout << "Enter the number of Vertices: ";
         std::cin >> nvertices;
         std::cout << '\n';
-        for (int i = 1; i < edgeCount; ++i) {
+        for (int i = 0; i < edgeCount; ++i) {
             std::cin >> x;
             std::cout << ' ';
             std::cin >> y; 
             std::cout << '\n';
             this->insert_edge(x, y);
-            ++degree[x];
-            ++nedges;
+            ++this->degree[x];
+            ++this->nedges;
             if(!directed){
                 ++degree[y];
                 this->insert_edge(y, x);
             }
         }
+        std::cout << "The no. of edges is: " << this->nedges << '\n';
     }
     std::array<edgeNode*, MAX+1> getList() const{
         return adjacentNodesListArray;

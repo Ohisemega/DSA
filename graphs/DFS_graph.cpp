@@ -35,10 +35,10 @@
 #include <vector>
 
 void process_edge(Graph& G, int parent, int child);
-void process_node_early(Graph& G, int node);
+void process_node_early(int node);
 void process_node_late(Graph& G, int node);
 bool process_edge_cycle_search(int start, int end, std::array<int, MAX+1>& parents);
-
+EdgeClass edge_classification(Graph& g, int parent, int child);
 std::array<int, MAX+1> entry_time;
 std::array<int, MAX+1> exit_time;
 std::array<int, MAX+1> reachable_ancestor;
@@ -88,14 +88,15 @@ void DFS_traversal(Graph& G, int Root, bool& is_cycle ){
         stk.pop();
         if(G.states[top] == NodeState::PROCESSED) continue; // If the node state is processed, skip everything!
         entry_time[top] = time_cnt;
-        
-        process_node_early(G, top);
+        std::cout << "Processing node: " << top << '\n';        
+        process_node_early(top);
         for(itr = G.getList()[top]; itr != nullptr; itr = itr->next) {
             if(G.states[itr->y] == NodeState::UNDISCOVERED){
-                G.states[itr->y] = NodeState::DISCOVERED;
-                G.parents[itr->y] = top; // TREE-EDGE
+                G.parents[itr->y] = top; // TREE-EDGE but don't change child node state yet!
                 vec.push_back(itr->y);
-                process_edge(G, top, itr->y); // do we want to process the edge early?!!
+                std::cout << "Process Edge: " << top << "--->" << itr->y << '\n';
+                process_edge(G, top, itr->y); // do we want to process the edge?
+                G.states[itr->y] = NodeState::DISCOVERED; // It is important to change the state only at the end of the IF condition!
             }else if((G.states[itr->y] == NodeState::DISCOVERED && G.parents[itr->y] != top/*BACK-EDGE*/) || G.is_directed()) {
                 // We check for the condition of G.is_directed() because in a directed graph, each edge (NOT NODE) has one discovery chance!
                 // In a directed graph, top ----> itr->y is still a BACK_EDGE, but we will have no access to that EDGE if we ignore THIS case!
@@ -130,12 +131,12 @@ void DFS_traversal_rec(Graph& G, int Root, bool& is_cycle) {
     itr = G.getList()[Root];
     ++time_cnt;
     entry_time[Root] = time_cnt;
-    process_node_early(G, Root);
+    process_node_early(Root);
     while(itr != nullptr){
         if(G.states[itr->y] == NodeState::UNDISCOVERED){
-            G.states[itr->y] = NodeState::DISCOVERED;
             G.parents[itr->y] = Root;
             process_edge(G, Root, itr->y);
+            G.states[itr->y] = NodeState::DISCOVERED;
             DFS_traversal_rec(G, Root, is_cycle); // The Recursive DFS_traversal_rec() call!
         }else if((G.states[itr->y] != NodeState::PROCESSED && G.parents[Root] != itr->y) || (G.is_directed())){
             is_cycle = process_edge_cycle_search(Root, itr->y, G.parents);
@@ -186,11 +187,12 @@ void process_node_early(int node) {
  *               Do this by checking entry_time[y] is < entry_time[reachable_ancestor[x]]; if so, update reachable_ancestor[x] = y;
  */
 void process_edge(Graph& G, int parent, int child) {
-    EdgeClass eclass = edge_classification(parent, child);
+    EdgeClass eclass = edge_classification(G, parent, child);
 
     if(eclass == EdgeClass::TREE_EDGE) {
         ++tree_node_degree[parent]; // The Tree Edge from the Parent--to-->Child. Here, the Child was in an UNDISCOVERED state, and the Parent is it's direct ancestor automatically!
         // Hence, the parent has a TREE_EDGE going out to the child in the DFS-Traversal and that is one more node_degree for the parent!
+        std::cout << "Incrementing the tree_node_degree of: " << parent << " to " << tree_node_degree[parent] << '\n';
     }
 
     if(eclass == EdgeClass::BACK_EDGE && (G.parents[parent] != child)) {
@@ -215,6 +217,9 @@ void process_node_late(Graph& G, int node) {
     bool root;
     int time_node;
     int time_parent;
+
+    std::cout << "Late proces node: " << node << '\n';
+    if(node == 1) std::cout << "Parent of node 1 is: " << G.parents[node] << " degree of node 1 is: " << tree_node_degree[node] << '\n';
     
     // the parent of the ROOT node of DFS/BFS-Tree traversal is always -1! This will particularly hold once the node has been FULLY PROCESSED!
     // All other nodes in the DFS/BFS-traversal Tre will have another node as a parent asides from the initial given node to iterate from!
@@ -235,7 +240,7 @@ void process_node_late(Graph& G, int node) {
             std::cout << "Parent Articulation Vertex! " << G.parents[node] << '\n';
             articulation_vertices.push_back(G.parents[node]);
         }else if(reachable_ancestor[node] == node) {
-            std::cout << "Bridge Articulation Vertex: " << node << '\n';
+            std::cout << "Bridge Articulation Vertex: " << node << " reachable_ancestor[node] == node\n";
             articulation_vertices.push_back(G.parents[node]);
 
             if(tree_node_degree[node] > 0) { // If node is NOT a LEAF_NODE i.e. it has tree_node_degree[node] > 0 (at least one child in the DFS-traversal tree)
@@ -250,5 +255,21 @@ void process_node_late(Graph& G, int node) {
     if(time_node < time_parent) { // Update node's parent's reachable ancestor if node has one more ancient than parent's!
                                   // Remember that DFS-traversal will next call this function on node's parent!
         reachable_ancestor[G.parents[node]] = reachable_ancestor[node];
+    }
+}
+
+EdgeClass edge_classification(Graph& G, int parent, int child) {
+    if(G.states[child] == NodeState::UNDISCOVERED) {
+        return EdgeClass::TREE_EDGE;
+    }
+    if(G.states[child] == NodeState::DISCOVERED && !G.is_directed()) {
+        return EdgeClass::BACK_EDGE;
+    }
+    if(G.states[child] == NodeState::DISCOVERED && entry_time[parent] < entry_time[child] && G.is_directed()) {
+        return EdgeClass::FWD_EDGE; // In a directed graph, if an edge leads from an
+                                    // earlier explored parent to a DISCOVERED child, it is a FORWARD EDGE 
+    } else if(G.states[child] == NodeState::DISCOVERED && entry_time[parent] > entry_time[child] && G.is_directed()) {
+        return EdgeClass::CROSS_EDGE; // In a directed graph, if an edge leads from an
+                                      // explored parent with a later entry time to a DISCOVERED child with an earlier entry, it is a CROSS EDGE 
     }
 }
