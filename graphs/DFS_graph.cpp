@@ -79,16 +79,16 @@ void DFS_traversal(Graph& G, int Root, bool& is_cycle ){
     vec.reserve(64);
     stk.push(Root);
     edgeNode* itr = nullptr;
-    G.states[Root] = NodeState::DISCOVERED;
     is_cycle = false;
     while(!stk.empty()) {
         time_cnt++;
         int top = stk.top();
-        unwind.push(top); // This STACK DS tracks the access mode of all nodes accessed from the DFS-traversal root to all leaves, and at the end of this while loop, we unpack this stack too!
         stk.pop();
-        if(G.states[top] == NodeState::PROCESSED) continue; // If the node state is processed, skip everything!
+        if(G.states[top] == NodeState::DISCOVERED) continue; // If the node state is DISCOVERED, skip everything!
+        unwind.push(top); // This STACK DS tracks the access mode of all nodes accessed from the DFS-traversal root to all leaves, and at the end of this while loop, we unpack this stack too!
         entry_time[top] = time_cnt;
-        std::cout << "Processing node: " << top << '\n';        
+        std::cout << "Processing node: " << top << '\n';
+        G.states[top] = NodeState::DISCOVERED;
         process_node_early(top);
         for(itr = G.getList()[top]; itr != nullptr; itr = itr->next) {
             if(G.states[itr->y] == NodeState::UNDISCOVERED){
@@ -96,7 +96,6 @@ void DFS_traversal(Graph& G, int Root, bool& is_cycle ){
                 vec.push_back(itr->y);
                 std::cout << "Process Edge: " << top << "--->" << itr->y << '\n';
                 process_edge(G, top, itr->y); // do we want to process the edge?
-                G.states[itr->y] = NodeState::DISCOVERED; // It is important to change the state only at the end of the IF condition!
             }else if((G.states[itr->y] == NodeState::DISCOVERED && G.parents[itr->y] != top/*BACK-EDGE*/) || G.is_directed()) {
                 // We check for the condition of G.is_directed() because in a directed graph, each edge (NOT NODE) has one discovery chance!
                 // In a directed graph, top ----> itr->y is still a BACK_EDGE, but we will have no access to that EDGE if we ignore THIS case!
@@ -118,6 +117,7 @@ void DFS_traversal(Graph& G, int Root, bool& is_cycle ){
     // exit time-stamps!
     while(!unwind.empty()){
         int unwind_node = unwind.top();
+        std::cout << "Popping " << unwind_node << '\n';
         unwind.pop();
         process_node_late(G, unwind_node);
         time_cnt++;
@@ -137,7 +137,7 @@ void DFS_traversal_rec(Graph& G, int Root, bool& is_cycle) {
             G.parents[itr->y] = Root;
             process_edge(G, Root, itr->y);
             G.states[itr->y] = NodeState::DISCOVERED;
-            DFS_traversal_rec(G, Root, is_cycle); // The Recursive DFS_traversal_rec() call!
+            DFS_traversal_rec(G, itr->y, is_cycle); // The Recursive DFS_traversal_rec() call!
         }else if((G.states[itr->y] != NodeState::PROCESSED && G.parents[Root] != itr->y) || (G.is_directed())){
             is_cycle = process_edge_cycle_search(Root, itr->y, G.parents);
             process_edge(G, Root, itr->y);
