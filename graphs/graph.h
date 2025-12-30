@@ -7,6 +7,13 @@ enum class NodeState{
     DISCOVERED,
     PROCESSED
 };
+
+enum class EdgeClass{
+    BACK_EDGE  = 0,
+    TREE_EDGE  = 1,
+    FWD_EDGE   = 2,
+    CROSS_EDGE = 4
+};
 // An Adjacency Graph Implementation!
 typedef struct edgeNode{
     int y;  // ID of this NODE!!!
@@ -73,15 +80,10 @@ typedef struct Graph{
         int nvertices; // current number of vertices currently in the graph
         std::array<edgeNode*, MAX+1> adjacentNodesListArray;
         int degree[MAX+1]; // The number of adjacent nodes for each node
-        void insert_edge(int x, int y) {
+        void insert_edge(int x, int y){
             edgeNode *p = nullptr;
             p = new edgeNode{y, 0, adjacentNodesListArray[x]};
             adjacentNodesListArray[x] = p;
-            ++degree[x];
-            ++this->nedges;
-            if(!directed){
-                insert_edge(y, x);
-            }
         }
 } Graph;
 
