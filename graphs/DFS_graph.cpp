@@ -84,7 +84,7 @@ void DFS_traversal(Graph& G, int Root, bool& is_cycle ){
         time_cnt++;
         int top = stk.top();
         stk.pop();
-        if(G.states[top] == NodeState::DISCOVERED) continue; // If the node state is DISCOVERED, skip everything!
+        if(G.states[top] == NodeState::DISCOVERED) continue; // If the PARENT node state is DISCOVERED, skip everything!
         unwind.push(top); // This STACK DS tracks the access mode of all nodes accessed from the DFS-traversal root to all leaves, and at the end of this while loop, we unpack this stack too!
         entry_time[top] = time_cnt;
         std::cout << "Processing node: " << top << '\n';
@@ -98,11 +98,12 @@ void DFS_traversal(Graph& G, int Root, bool& is_cycle ){
                 process_edge(G, top, itr->y); // do we want to process the edge?
             }else if((G.states[itr->y] == NodeState::DISCOVERED && G.parents[itr->y] != top/*BACK-EDGE*/) || G.is_directed()) {
                 // We check for the condition of G.is_directed() because in a directed graph, each edge (NOT NODE) has one discovery chance!
-                // In a directed graph, top ----> itr->y is still a BACK_EDGE, but we will have no access to that EDGE if we ignore THIS case!
-                // If an edge leads from Node-top to a DISCOVERED node itr->y, it must be processed now or LOST!
+                // In a directed graph, if the child node is discovered (by some earlier node in the tree traversal)
+                // Then when we get here, the parent and child are both DISCOVERED, but we still need to process the edge!
                 // In an undirected graph, that is simply a BACK_EDGE and useful for identifying cycles or updating reachable_ancestor[] IDs 
                 if(G.states[itr->y] == NodeState::DISCOVERED && G.parents[top] != itr->y) is_cycle = true; // This Graph HAS A CYCLE!
                 process_edge(G, top, itr->y);
+                std::cout << "Processing edge of DISCOVERED nodes: " << top << "----->" << itr->y << '\n';
             }
         }
         for(int i = vec.size()-1; i >= 0; --i) {
@@ -110,6 +111,9 @@ void DFS_traversal(Graph& G, int Root, bool& is_cycle ){
         }
         vec.clear();
     }
+    for (int i = 1; i< G.vertices(); ++i)
+        std::cout << G.parents[i] << ' ';
+    std::cout << '\n';
     
     // This step simulates unwinding the recursive call of the DFS-traversal once we have 
     // traversed the whole connected component of Root. We recorded the access mode in reverse 
@@ -144,10 +148,10 @@ void DFS_traversal_rec(Graph& G, int Root, bool& is_cycle) {
         }
         itr = itr->next;
     }
+    process_node_late(G, Root);
     G.states[Root] = NodeState::PROCESSED;
     ++time_cnt;
     exit_time[Root] = time_cnt;
-    process_node_late(G, Root);
 }
 
 void find_path(int start, int end, std::array<int, MAX+1>& parents) {
@@ -262,7 +266,7 @@ EdgeClass edge_classification(Graph& G, int parent, int child) {
     if(G.states[child] == NodeState::UNDISCOVERED) {
         return EdgeClass::TREE_EDGE;
     }
-    if(G.states[child] == NodeState::DISCOVERED && !G.is_directed()) {
+    if(G.states[child] == NodeState::DISCOVERED) {
         return EdgeClass::BACK_EDGE;
     }
     if(G.states[child] == NodeState::DISCOVERED && entry_time[parent] < entry_time[child] && G.is_directed()) {
