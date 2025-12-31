@@ -11,6 +11,18 @@
 // return true;
 void BFS_traversal(Graph&, int);
 //
+
+Graph Transponse_graph(Graph& G) {
+    Graph transpose = G;
+    transpose.initialize();
+    for(int i = 1; i < G.vertices(); ++i){
+        for(edgeNode* itr = G.getList()[i]; itr != nullptr; itr = itr->next) {
+            transpose.public_insert(itr->y, i);
+        }
+    }
+    return transpose;
+}
+
 bool is_SCC_graph(Graph& G, int vertex) {
     G.initialize();
     BFS_traversal(G, vertex);
