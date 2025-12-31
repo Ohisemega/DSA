@@ -12,12 +12,14 @@ enum class EdgeClass{
     BACK_EDGE  = 0,
     TREE_EDGE  = 1,
     FWD_EDGE   = 2,
-    CROSS_EDGE = 4
+    CROSS_EDGE = 4,
+    NO_EDGE    = 8,
 };
 // An Adjacency Graph Implementation!
 typedef struct edgeNode{
     int y;  // ID of this NODE!!!
     int weight; // Weight of this edge if any
+    EdgeClass eclass; // classification of the edge parent ----> y;
     struct edgeNode* next;
 }edgeNode;
 
@@ -58,7 +60,7 @@ typedef struct Graph{
         }
         std::cout << "The no. of edges is: " << this->nedges << '\n';
     }
-    std::array<edgeNode*, MAX+1> getList() const{
+    std::array<edgeNode*, MAX+1>& getList() {
         return adjacentNodesListArray;
     }
 
@@ -95,7 +97,7 @@ typedef struct Graph{
         std::array<int, MAX+1> degree; // The number of adjacent nodes for each node
         void insert_edge(int x, int y){
             edgeNode *p = nullptr;
-            p = new edgeNode{y, 0, adjacentNodesListArray[x]};
+            p = new edgeNode{y, 0, EdgeClass::NO_EDGE, adjacentNodesListArray[x]};
             adjacentNodesListArray[x] = p;
         }
 } Graph;
