@@ -1,4 +1,7 @@
-/** The algorithm for th
+/** The algorithm for detecting if a given Graph
+ * Can be color labelled to become a BIPARTITE
+ * GRAPH!
+ */
 
 #include "graph.h"
 
