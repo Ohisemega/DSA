@@ -37,7 +37,7 @@ typedef struct Graph{
     }
     void read_graph() {
         int edgeCount;
-        int x, y;
+        int x, y, W;
 
         std::cout << "Enter the number of Edges: ";
         std::cin >> edgeCount;
@@ -48,14 +48,16 @@ typedef struct Graph{
         for (int i = 0; i < edgeCount; ++i) {
             std::cin >> x;
             std::cout << ' ';
-            std::cin >> y; 
+            std::cin >> y;
+            std::cout << ' ';
+            std::cin >> W;
             std::cout << '\n';
-            this->insert_edge(x, y);
+            this->insert_edge(x, y, W);
             ++this->degree[x];
             ++this->nedges;
             if(!directed){
                 ++degree[y];
-                this->insert_edge(y, x);
+                this->insert_edge(y, x, W);
             }
         }
         std::cout << "The no. of edges is: " << this->nedges << '\n';
@@ -76,15 +78,15 @@ typedef struct Graph{
         return directed;
     }
 
-    void public_insert(int x, int y){
+    void public_insert(int x, int y, int weight = 0){
         ++this->degree[x];
         ++this->nedges;
         ++this->nedges;
         if(!directed){
             ++degree[y];
-            this->insert_edge(y, x);
+            this->insert_edge(y, x, weight);
         }
-        insert_edge(x, y);
+        insert_edge(x, y, weight);
     }
 
     std::array<NodeState, MAX+1> states;
@@ -95,9 +97,9 @@ typedef struct Graph{
         int nvertices; // current number of vertices currently in the graph
         std::array<edgeNode*, MAX+1> adjacentNodesListArray;
         std::array<int, MAX+1> degree; // The number of adjacent nodes for each node
-        void insert_edge(int x, int y){
+        void insert_edge(int x, int y, int weight){
             edgeNode *p = nullptr;
-            p = new edgeNode{y, 0, EdgeClass::NO_EDGE, adjacentNodesListArray[x]};
+            p = new edgeNode{y, weight, EdgeClass::NO_EDGE, adjacentNodesListArray[x]};
             adjacentNodesListArray[x] = p;
         }
 } Graph;
