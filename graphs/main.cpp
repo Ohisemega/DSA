@@ -10,5 +10,5 @@ int main(){
     G.read_graph();
     bool is_cycle = false;
     DFS_module_init();
-    DFS_traversal(G, 0, is_cycle);
+    DFS_traversal(G, 1, is_cycle);
 }

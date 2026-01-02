@@ -53,6 +53,7 @@ void DFS_module_init(){
     reachable_ancestor.fill(-1);
     tree_node_degree.fill(0);
     articulation_vertices.clear();
+    while(!topological_sort.empty()) topological_sort.pop();
 }
 
 std::stack<int>& get_topological_sort_stack(){
@@ -78,9 +79,9 @@ std::stack<int>& get_topological_sort_stack(){
  * }
  */
 void DFS_traversal(Graph& G, int Root, bool& is_cycle ){
-    std::stack<int> stk;
+    std::stack<int> stk; // Only the element at the top of this stack is set to DISCOVERED state at the beginning of the WHILE-LOOP
     std::stack<int> unwind;
-    std::vector<int> vec;
+    std::vector<int> vec; // used in conjunction with the STACK stk to simulate a Recursive algorithm!
     vec.reserve(64);
     stk.push(Root);
     edgeNode* itr = nullptr;
