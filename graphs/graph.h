@@ -44,15 +44,21 @@ typedef struct Graph{
         std::cin >> edgeCount;
         std::cout << "Enter the number of Vertices: ";
         std::cin >> nvertices;
+        std::cout << "Is the graph weighted or unweighted (1 or 0): ";
+        std::cin >> this->weighted;
+        std::cout >> "Is the graph directed or undirected (1 or 0): ";
+        std::cin >> this->directed;
         ++nvertices;
         std::cout << '\n';
         for (int i = 0; i < edgeCount; ++i) {
             std::cin >> x;
             std::cout << ' ';
             std::cin >> y;
-            std::cout << ' ';
-            std::cin >> W;
-            std::cout << '\n';
+            if(this->weighted) {
+                std::cout << ' ';
+                std::cin >> W;
+                std::cout << '\n';
+            }
             this->insert_edge(x, y, W);
             ++this->degree[x];
             ++this->nedges;
@@ -79,6 +85,10 @@ typedef struct Graph{
         return directed;
     }
 
+    bool is_weighted() const{
+        return weighted;
+    }
+
     void public_insert(int x, int y, int weight = 0){
         ++this->degree[x];
         ++this->nedges;
@@ -93,6 +103,7 @@ typedef struct Graph{
     std::array<NodeState, MAX+1> states;
     std::array<int, MAX+1> parents;
     private:
+        bool weighted;
         bool directed; // Is the graph directed or undirected. This will influence how we add edges (reciprocal/nor reciprocal: x-y: x has an edge to y, does y have an edge to x??)
         int nedges; // current number of vertices currently in the graph
         int nvertices; // current number of vertices currently in the graph

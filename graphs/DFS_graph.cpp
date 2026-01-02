@@ -152,7 +152,7 @@ void DFS_traversal_rec(Graph& G, int Root, bool& is_cycle) {
             itr->eclass = process_edge(G, Root, itr->y);
             G.states[itr->y] = NodeState::DISCOVERED;
             DFS_traversal_rec(G, itr->y, is_cycle); // The Recursive DFS_traversal_rec() call!
-        }else if((G.states[itr->y] != NodeState::PROCESSED && G.parents[Root] != itr->y) || (G.is_directed())){
+        }else if((G.states[itr->y] == NodeState::DISCOVERED && G.parents[Root] != itr->y) || (G.is_directed())){
             is_cycle = process_edge_cycle_search(Root, itr->y, G.parents);
             itr->eclass = process_edge(G, Root, itr->y);
         }
