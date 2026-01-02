@@ -1,4 +1,5 @@
 #include <iostream>
+#include <tuple>
 #include <array>
 #define MAX 200
 
@@ -107,4 +108,34 @@ typedef struct Graph{
 // The  nvertices and
 //      nedges count are actually statistical metrics fir an object of this class/struct.
 // They are good for fast query but not utilized directly by algorithms working on this DS
+
+/** Implementation for a Union_Find Data Structure! This will support the Kruskal Algorithm for finding the MST **/
+struct UnionFind{
+    std::array<int, MAX+1> parents;
+    std::array<int, MAX+1> sz; // Size of elements in the subtree
+    int N; // Number of elements in the set
+    void initialize() {
+        for(int i = 0; i < parents.size(); ++i) {
+            parents[i] = i; // every node is initially it's own parent
+        }
+        sz.fill(1);
+    }
+
+    std::tuple<bool, int, int> is_same_tree(int n1, int n2) {
+        int i, j;
+        for(i = n1; i != parents[i]; i = parents[i]);
+        for(j = n2; j != parents[j]; j = parents[j]);
+        return std::tuple(i == j, i, j);
+    }
+
+    void union_alg(int i, int j){
+        if(sz[i] < sz[j]){
+            parents[i] = j;
+            sz[j] += sz[i];
+        }else{
+            parents[j] = i;
+            sz[i] += sz[j];
+        }
+    }
+};
 
