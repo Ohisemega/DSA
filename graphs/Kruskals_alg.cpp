@@ -1,11 +1,9 @@
 #include "graph.h"
 #include <vector>
 #include <algorithm>
-#include <unordered_set>
 
 int kruskal_alg(Graph& G, std::vector<std::pair<int, int>> MST ){
     int total_cost = 0;
-    std::unordered_set<int> in_mst_set;
     using cost = int;
     std::vector<std::tuple<cost, int, int>> sorted_cost_arr;
     UnionFind UF;
@@ -28,6 +26,7 @@ int kruskal_alg(Graph& G, std::vector<std::pair<int, int>> MST ){
             total_cost += std::get<0>(sorted_cost_arr[i]);
             MST.push_back(std::pair(std::get<1>(sorted_cost_arr[i]), std::get<2>(sorted_cost_arr[i])));
         }
+        if(UF.getMaxTreeSize() == G.vertices()) break; // we have added all the vertices in the Graph into a single tree in the UF algorithm!
     }
     return total_cost; // return the total cost of the MST from kruskal
 }
