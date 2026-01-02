@@ -113,12 +113,12 @@ typedef struct Graph{
 struct UnionFind{
     std::array<int, MAX+1> parents;
     std::array<int, MAX+1> sz; // Size of elements in the subtree
-    int N; // Number of elements in the set
     void initialize() {
         for(int i = 0; i < parents.size(); ++i) {
             parents[i] = i; // every node is initially it's own parent
         }
         sz.fill(1);
+        N = 0;
     }
 
     std::tuple<bool, int, int> is_same_tree(int n1, int n2) {
@@ -132,10 +132,19 @@ struct UnionFind{
         if(sz[i] < sz[j]){
             parents[i] = j;
             sz[j] += sz[i];
+            N = std::max(N, sz[j]);
         }else{
             parents[j] = i;
             sz[i] += sz[j];
+            N = std::max(N, sz[j]);
         }
     }
+    
+    int getMaxTreeSize() const{
+        return N;
+    }
+
+    private:
+        int N; // maximum number of vertices in any tree in this forest!
 };
 
