@@ -12,7 +12,7 @@ struct less_hobj{
     }
 };
 
-void prim_alg_init(Graph& G, int Root){
+std::vector<std::pair<Node_ID, Node_ID>> prim_alg_init(Graph& G, int Root, int& t_cost){
     std::priority_queue<heap_obj, std::vector<heap_obj>, less_hobj> min_cost_heap;
     std::array<int, MAX+1> distance;
     std::array<bool, MAX+1> in_tree; //
@@ -42,6 +42,8 @@ void prim_alg_init(Graph& G, int Root){
             } // Loop over the heap!
         }
     }
+    t_cost = total_cost;
+    return MST;
 }
 
 /** This algorithm has similarities with BFS, but study and understand it!**/
