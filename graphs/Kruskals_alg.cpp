@@ -8,6 +8,8 @@ int kruskal_alg(Graph& G, std::vector<std::pair<int, int>> MST ){
     std::unordered_set<int> in_mst_set;
     using cost = int;
     std::vector<std::tuple<cost, int, int>> sorted_cost_arr;
+    UnionFind UF;
+    UF.initialize();
     sorted_cost_arr.reserve(G.vertices() + 16);
     G.states.fill(NodeState::UNDISCOVERED);
     for(int i = 0; i <= G.vertices(); ++i) {
@@ -20,12 +22,11 @@ int kruskal_alg(Graph& G, std::vector<std::pair<int, int>> MST ){
     G.states.fill(NodeState::UNDISCOVERED);
     std::sort(sorted_cost_arr.begin(), sorted_cost_arr.end());
     for(int i = 0; i < sorted_cost_arr.size(); ++i) {
-        if(in_mst_set.count(std::get<1>(sorted_cost_arr[i])) == 0 || in_mst_set.count(std::get<2>(sorted_cost_arr[i])) == 0){
-           // If either of the nodes of this edge is NOT in the in_mst_set/visited set, then add this edge to the MST!
+        std::tuple<bool, int, int> temp = UF.is_same_tree(std::get<1>(sorted_cost_arr[i]), std::get<1>(sorted_cost_arr[i]));
+        if(!std::get<0>(temp)){
+            UF.union_alg(std::get<1>(temp), std::get<2>(temp));
             total_cost += std::get<0>(sorted_cost_arr[i]);
             MST.push_back(std::pair(std::get<1>(sorted_cost_arr[i]), std::get<2>(sorted_cost_arr[i])));
-            in_mst_set.insert(std::get<1>(sorted_cost_arr[i]));
-            in_mst_set.insert(std::get<2>(sorted_cost_arr[i]));
         }
     }
     return total_cost; // return the total cost of the MST from kruskal
