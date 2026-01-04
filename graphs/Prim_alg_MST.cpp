@@ -1,3 +1,22 @@
+/** What is PRIM's Algorithm **/
+/*
+1. Given a Graph representation (either an adjacency list or a set of edges, or an adjacency square-matrix)
+2. Given a Root node in that graph (or choosing one at random).
+3. Set the TOTAL_COST variable of the MST to be 0!
+4. Iterate through ALL neighbors of the root:
+5.      Add the edge-pairs (with their associated cost-value) to a minimum heap aka MIN PRIORITY QUEUE.
+6. <WHILE> the MIN PRIORITY QUEUE is not empty:
+7.      Pop the top element or edge-pair in the MIN PRIORITY QUEUE.
+8.      <IF> the 1st element of the edge-pair is in UNDISCOVERED state:
+9.          Set the state of 1st-element-of-pair to be DISCOVERED / VISITED.
+10.          Add the edge-pair to the list of edges in the MST vector.
+11.         Update the TOTAL_COST variable of the MST.
+12.         Iterate through ALL neighbours of the 2nd-element-of-pair.
+13.             <IF> the 2nd element is in UNDISCOVERED state:
+14.                 Add the edge-pair with their associated cost to the MIN PRIORITY QUEUE.
+15. Loop to STEP 5!
+*/
+
 #include "graph.h"
 #include <queue>
 #include <tuple>
@@ -12,7 +31,7 @@ struct less_hobj{
     }
 };
 
-std::vector<std::pair<Node_ID, Node_ID>> prim_alg_init(Graph& G, int Root, int& t_cost){
+std::vector<std::pair<Node_ID, Node_ID>> prim_alg(Graph& G, int Root, int& t_cost){
     std::priority_queue<heap_obj, std::vector<heap_obj>, less_hobj> min_cost_heap;
     std::array<int, MAX+1> distance;
     std::array<bool, MAX+1> in_tree; //
