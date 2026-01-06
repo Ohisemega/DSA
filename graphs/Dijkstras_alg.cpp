@@ -1,13 +1,13 @@
 #include "graph.h"
 #include <limits>
 #include <queue>
-//
 
 int Dijkstra_alg(Graph& G, int start, int dest, std::vector<std::vector<int>> sp/*where to store the shortest path*/){
     std::array<int, MAX+1> cmin_costs; // array of the minimum cost - for node-i, we have found so far from start----to--->i.
     cmin_costs.fill(std::numeric_limits<int>::max()); // initialize all costs to be 'infinitely expensive'
     cmin_costs[0] = 0; // we however know that the cost from start----to---->start IS EQUAL to 0
-    G.initialize();
+    G.states.fill(NodeState::UNDISCOVERED); // initialize all the node states as UNDISCOVERED
+    G.parents.fill(-1); // initialize all the node parents as -1: a sentinel value meaning ROOT!
     using cost = int; // aliasing int with the name 'cost'
     using p_node = int; // data type of parent node IDs
     using ch_node = int; // data type of child node IDs
@@ -25,8 +25,8 @@ int Dijkstra_alg(Graph& G, int start, int dest, std::vector<std::vector<int>> sp
         G.parents[itr->y] = start;
         cmin_costs[itr->y] = itr->weight + cmin_costs[start];
     }
-    G.states[start] = NodeState::DISCOVERED;
-    int shortest_path_cost = 0;
+    G.states[start] = NodeState::DISCOVERED; // set the start node state to be DISCOVERED
+    int shortest_path_cost = 0;  // initialize the total cost of the shortest path to be 0! This is an accumulator!
 
     while(!min_heap.empty()){
         heap_obj top = min_heap.top(); // explore next smallest town!
@@ -37,9 +37,9 @@ int Dijkstra_alg(Graph& G, int start, int dest, std::vector<std::vector<int>> sp
         if(cmin_costs[child] > std::get<0>(top)){
             cmin_costs[child] = std::get<0>(top);
             G.parents[child] = std::get<1>(top);
-            shortest_path_cost += cmin_costs[child];
             sp.push_back({std::get<1>(top), child});
         }
+        shortest_path_cost += cmin_costs[child];
 
         if(G.states[child] == NodeState::UNDISCOVERED){
             G.states[child] = NodeState::DISCOVERED;
