@@ -20,19 +20,85 @@ enum class EdgeClass{
 typedef struct edgeNode{
     int y;  // ID of this NODE!!!
     int weight; // Weight of this edge if any
-    EdgeClass eclass; // classification of the edge parent ----> y;
+    EdgeClass eclass; // classification of the edge "adj_list[x]---->y";
     struct edgeNode* next;
 }edgeNode;
 
+struct Adjacency_Matrix {
+    std::array<int, MAX+1> parents;
+    std::array<int, MAX+1> states;
+    int nvertices; /* number of vertices in graph */
+    
+    bool is_directed() const{
+        return directed;
+    }
+
+    bool is_weighted() const{
+        return weighted;
+    }
+
+    bool edges() const{
+        return nedges;
+    }
+
+    void read_graph(){
+        int edgeCount;
+        int x, y, W;
+        std::cout << "Enter the number of Edges: ";
+        std::cin >> edgeCount;
+        std::cout << "Enter the number of Vertices: ";
+        std::cin >> nvertices;
+        std::cout << "Is the graph weighted or unweighted (1 or 0): ";
+        std::cin >> weighted;
+        std::cout << "Is the graph directed or undirected (1 or 0): ";
+        std::cin >> this->directed;
+        for (int i = 0; i < edgeCount; ++i) {
+            W = 0;
+            std::cin >> x;
+            std::cout << ' ';
+            std::cin >> y;
+            if(x < 0 || x > MAX || y < 0 || y > MAX){
+                std::cout << "Warning: Try again, and enter a positive number between 0 and " << MAX << '\n';
+                continue;
+            }else{
+                if(this->weighted) {
+                    std::cout << ' ';
+                    std::cin >> weights[x][y];
+                    ++degree[x];
+                    if(!directed){
+                        weights[y][x] = weights[x][y];
+                        ++degree[y];
+                    }
+                    std::cout << '\n';
+                }else{
+                    weights[x][y] = 1;
+                    ++degree[x];
+                    if(!directed){
+                        weights[y][x] = 1;
+                        ++degree[y];
+                    }
+                }
+                ++this->degree[x];
+                ++this->nedges;
+            }
+        }
+    }
+
+    private:
+        std::array<int, MAX+1> degree; // number of neighbours each vertex has
+        std::array<std::array<int, MAX+1>, MAX+1> weights; /* adjacency/weight info */
+        int nedges;
+        bool directed;
+        bool weighted; // edge weighted
+};
+
 typedef struct Graph{
-    Graph(bool directed, unsigned int maxV, unsigned int maxE): directed{directed}, nvertices{1}, nedges{0} {
+    Graph(bool directed_, bool weighted_, unsigned int maxV, unsigned int maxE): directed{directed_}, weighted{weighted_},  nvertices{1}, nedges{0} {
         
     }
     void initialize() {
-        for (int i = 1; i < MAX; ++i) {
-            this->degree[i] = 0;
-            this->adjacentNodesListArray[i] = NULL;
-        }
+        adjacentNodesListArray.fill(nullptr);
+        degree.fill(0);
         states.fill(NodeState::UNDISCOVERED);
         parents.fill(-1);
     }
@@ -46,11 +112,12 @@ typedef struct Graph{
         std::cin >> nvertices;
         std::cout << "Is the graph weighted or unweighted (1 or 0): ";
         std::cin >> this->weighted;
-        std::cout >> "Is the graph directed or undirected (1 or 0): ";
+        std::cout << "Is the graph directed or undirected (1 or 0): ";
         std::cin >> this->directed;
         ++nvertices;
         std::cout << '\n';
         for (int i = 0; i < edgeCount; ++i) {
+            W = 0;
             std::cin >> x;
             std::cout << ' ';
             std::cin >> y;
@@ -73,11 +140,11 @@ typedef struct Graph{
         return adjacentNodesListArray;
     }
 
-    int vertices() const {
+    unsigned int vertices() const {
         return nvertices;
     }
 
-    int edges() const{
+    unsigned int edges() const{
         return nedges;
     }
 
@@ -105,8 +172,8 @@ typedef struct Graph{
     private:
         bool weighted;
         bool directed; // Is the graph directed or undirected. This will influence how we add edges (reciprocal/nor reciprocal: x-y: x has an edge to y, does y have an edge to x??)
-        int nedges; // current number of vertices currently in the graph
-        int nvertices; // current number of vertices currently in the graph
+        unsigned int nedges; // current number of vertices currently in the graph
+        unsigned int nvertices; // current number of vertices currently in the graph
         std::array<edgeNode*, MAX+1> adjacentNodesListArray;
         std::array<int, MAX+1> degree; // The number of adjacent nodes for each node
         void insert_edge(int x, int y, int weight){
