@@ -1,6 +1,7 @@
 #include <iostream>
 #include <tuple>
 #include <array>
+#include <limits>
 #define MAX 200
 
 enum class NodeState{
@@ -26,9 +27,19 @@ typedef struct edgeNode{
 
 struct Adjacency_Matrix {
     std::array<int, MAX+1> parents;
-    std::array<int, MAX+1> states;
-    int nvertices; /* number of vertices in graph */
-    
+    std::array<NodeState, MAX+1> states;
+   
+    void initialize(){
+        for(int i = 0; i < MAX+1; ++i){
+            weights[i].fill(std::numeric_limits<int>::max()); // each edge has an infinite cost to access the end-node
+        }
+        parents.fill(-1);
+        states.fill(NodeState::UNDISCOVERED);
+        degree.fill(0); // each node initialized to having no neighbour
+        weighted = directed = false; // initialized as not weighted nor directed
+        nvertices = nedges = 0; // no edges in the graph initially
+    }
+
     bool is_directed() const{
         return directed;
     }
@@ -37,8 +48,12 @@ struct Adjacency_Matrix {
         return weighted;
     }
 
-    bool edges() const{
+    int edges() const{
         return nedges;
+    }
+
+    int vertices() const{
+        return nvertices;
     }
 
     void read_graph(){
@@ -52,6 +67,7 @@ struct Adjacency_Matrix {
         std::cin >> weighted;
         std::cout << "Is the graph directed or undirected (1 or 0): ";
         std::cin >> this->directed;
+
         for (int i = 0; i < edgeCount; ++i) {
             W = 0;
             std::cin >> x;
@@ -88,6 +104,7 @@ struct Adjacency_Matrix {
         std::array<int, MAX+1> degree; // number of neighbours each vertex has
         std::array<std::array<int, MAX+1>, MAX+1> weights; /* adjacency/weight info */
         int nedges;
+        int nvertices;
         bool directed;
         bool weighted; // edge weighted
 };
@@ -114,7 +131,7 @@ typedef struct Graph{
         std::cin >> this->weighted;
         std::cout << "Is the graph directed or undirected (1 or 0): ";
         std::cin >> this->directed;
-        ++nvertices;
+        
         std::cout << '\n';
         for (int i = 0; i < edgeCount; ++i) {
             W = 0;
