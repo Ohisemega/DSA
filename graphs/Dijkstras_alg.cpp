@@ -26,26 +26,15 @@ int Dijkstra_alg(Graph& G, int start, int dest, std::vector<std::vector<int>> sp
         cmin_costs[itr->y] = itr->weight + cmin_costs[start];
     }
     G.states[start] = NodeState::DISCOVERED; // set the start node state to be DISCOVERED
-    int shortest_path_cost = 0;  // initialize the total cost of the shortest path to be 0! This is an accumulator!
     int node_count = 1;
 
     while(!min_heap.empty()){
         heap_obj top = min_heap.top(); // explore next smallest town!
         min_heap.pop();
         ch_node child = std::get<2>(top);
-        if(node_count == G.vertices()) break;
-
-        // update the child's min travel cost if this current edge has a better option!
-        if(cmin_costs[child] > std::get<0>(top)){
-            cmin_costs[child] = std::get<0>(top);
-            G.parents[child] = std::get<1>(top);
-        }
-        sp.push_back({std::get<1>(top), child});
-        shortest_path_cost += cmin_costs[child];
-        if(child == dest) break;
+        if(G.states[child] == NodeState::DISCOVERED) continue;
 
         if(G.states[child] == NodeState::UNDISCOVERED){
-            ++node_count;
             G.states[child] = NodeState::DISCOVERED;
             for(edgeNode* itr = G.getList()[child]; itr != nullptr; itr = itr->next){
                 if(cmin_costs[itr->y] > (cmin_costs[child] + itr->weight)){
@@ -56,5 +45,6 @@ int Dijkstra_alg(Graph& G, int start, int dest, std::vector<std::vector<int>> sp
             } 
         } 
     }
-    return shortest_path_cost;
+    // The shortest path array is built by following the linked list of child to parent using the parent[] array
+    return cmin_costs[dest];
 }
