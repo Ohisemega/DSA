@@ -52,4 +52,6 @@ int minCost_memo_rec(int start, int end, std::array<std::array<int, MAX>, MAX> c
             min_cost = stop_over_cost;
         }
         min_cost_mem[start][end] = min_cost;
+    }
+    return min_cost;
 }
