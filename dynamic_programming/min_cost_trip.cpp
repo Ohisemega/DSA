@@ -27,3 +27,29 @@ int minCost_rec(int start, int end, std::array<std::array<int, MAX>, MAX> cost_m
 
     return min_cost; // placeholder 
 }
+
+std::array<std::array<int, MAX>, MAX> min_cost_mem;
+
+void init_memo(){
+    for(int i = 0; i < MAX; ++i){
+        min_cost_mem[i].fill(-1);        
+    }
+}
+
+int minCost_memo_rec(int start, int end, std::array<std::array<int, MAX>, MAX> cost_mat){
+    if(start == end-1 || start == end){
+        return cost_mat[start][end];
+    }
+    
+    if(min_cost_mem[start][end] != -1){
+        return min_cost_mem[start][end];
+    }
+
+    int min_cost = cost_mat[start][end];
+    for(int i = start+1; i < end; ++i){
+        int stop_over_cost = minCost_rec(start, i, cost_mat) + minCost_rec(i, end, cost_mat);
+        if(stop_over_cost < min_cost){
+            min_cost = stop_over_cost;
+        }
+        min_cost_mem[start][end] = min_cost;
+}
