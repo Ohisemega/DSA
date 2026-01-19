@@ -6,7 +6,6 @@ int Dijkstra_alg(Graph& G, int start, int dest, std::vector<std::vector<int>> sp
     std::array<int, MAX+1> cmin_costs; // array of the minimum cost - for node-i, we have found so far from start----to--->i.
     cmin_costs.fill(std::numeric_limits<int>::max()); // initialize all costs to be 'infinitely expensive'
     cmin_costs[0] = 0; // we however know that the cost from start----to---->start IS EQUAL to 0
-    G.states.fill(NodeState::UNDISCOVERED); // initialize all the node states as UNDISCOVERED
     G.parents.fill(-1); // initialize all the node parents as -1: a sentinel value meaning ROOT!
     using cost = int; // aliasing int with the name 'cost'
     using p_node = int; // data type of parent node IDs
@@ -32,17 +31,13 @@ int Dijkstra_alg(Graph& G, int start, int dest, std::vector<std::vector<int>> sp
         heap_obj top = min_heap.top(); // explore next smallest town!
         min_heap.pop();
         ch_node child = std::get<2>(top);
-        if(G.states[child] == NodeState::DISCOVERED) continue;
 
-        if(G.states[child] == NodeState::UNDISCOVERED){
-            G.states[child] = NodeState::DISCOVERED;
-            for(edgeNode* itr = G.getList()[child]; itr != nullptr; itr = itr->next){
-                if(cmin_costs[itr->y] > (cmin_costs[child] + itr->weight)){
-                    cmin_costs[itr->y] = cmin_costs[child] + itr->weight; // update the current known min cost to get to itr->y as we have found a smaller one!
-                    G.parents[itr->y] = child; // since itr->y has a new min travel cost on this edge, it's new parent is child!
-                    min_heap.push(std::tuple(cmin_costs[itr->y], child, itr->y));
-                }
-            } 
+        for(edgeNode* itr = G.getList()[child]; itr != nullptr; itr = itr->next){
+            if(cmin_costs[itr->y] > (cmin_costs[child] + itr->weight)){
+                cmin_costs[itr->y] = cmin_costs[child] + itr->weight; // update the current known min cost to get to itr->y as we have found a smaller one!
+                G.parents[itr->y] = child; // since itr->y has a new min travel cost on this edge, it's new parent is child!
+                min_heap.push(std::tuple(cmin_costs[itr->y], child, itr->y));
+            }
         } 
     }
     // The shortest path array is built by following the linked list of child to parent using the parent[] array
