@@ -10,24 +10,24 @@ void print_str(const std::string& str, std::array<bool, N>& bool_arr){
 }
 
 template<size_t M>
-void print_substrings(const std::string& m_str, std::array<bool, M>& bool_arr, int n) {
+void print_subsets(const std::string& m_str, std::array<bool, M>& bool_arr, int n) {
     if(n < 0){
         print_str<M>(m_str, bool_arr);
         return;
     }
     bool_arr[n] = false;
-    print_substrings(m_str, bool_arr, n-1);
+    print_subsets(m_str, bool_arr, n-1);
     bool_arr[n] = true;
-    print_substrings(m_str, bool_arr, n-1);
+    print_subsets(m_str, bool_arr, n-1);
 }
 
 
 void caller(const std::string& str){
-    std::array<bool, 4>bool_arr;
+    std::array<bool, 10>bool_arr;
     bool_arr.fill(true);
-    print_substrings<4>(str, bool_arr, str.size()-1);
+    print_subsets<10>(str, bool_arr, str.size()-1);
 }
 
 int main(){
-    caller("1234");
+    caller("triumphant");
 }
