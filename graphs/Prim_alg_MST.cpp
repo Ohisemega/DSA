@@ -25,44 +25,40 @@
 
 using Node_ID = int;
 using Weight = int;
-using heap_obj = std::tuple<Weight, Node_ID, Node_ID>;
+using heap_obj = std::tuple<Weight, Node_ID>;
 
-struct less_hobj{
+struct greater_hobj{
     bool operator()(heap_obj& a, heap_obj& b){
-        return std::get<0>(a) < std::get<0>(b);
+        return std::get<0>(a) > std::get<0>(b);
     }
 };
 
 std::vector<std::pair<Node_ID, Node_ID>> prim_alg(Graph& G, int Root, int& t_cost){
-    std::priority_queue<heap_obj, std::vector<heap_obj>, less_hobj> min_cost_heap;
-    std::array<int, MAX+1> distance;
-    std::array<bool, MAX+1> in_tree; //
+    std::priority_queue<heap_obj, std::vector<heap_obj>, greater_hobj> min_cost_heap;
     G.states[Root] = NodeState::DISCOVERED;
     int total_cost = 0;
 //  std::unordered_set<int> visited; // A data structure that allow O(1) time complexity for checking 
     std::vector<std::pair<Node_ID, Node_ID>> MST; // Minimum Spanning Tree!
+    MST.reserve(MAX);
     edgeNode* itr = nullptr;
-    in_tree[Root] = true;
     std::unordered_set<int> vert_set; // a set DS to track all nodes tha have been added to the Minimum Spanning Tree 
 
-    for(edgeNode* itr = G.getList()[Root]; itr != nullptr; itr = itr->next){
-        min_cost_heap.push(heap_obj(itr->weight, Root, itr->y));
-    }
-
+    min_cost_heap.push({0, Root});
+    vert_set.insert(Root);
     while(!min_cost_heap.empty()){
         if(G.vertices() == vert_set.size()) break; // all vertices are in the MST! 
         heap_obj my_min = min_cost_heap.top(); // get the minimum edge!
         min_cost_heap.pop(); // pop the minimum edge
-        Node_ID child = std::get<2>(my_min);
-        if(G.states[child] == NodeState::UNDISCOVERED){ // If the child node of the edge is UNDISCOVERED 
-            G.states[child] = NodeState::DISCOVERED; // set it to DISCOVERED
-            MST.push_back(std::pair(std::get<1>(my_min), child)); // Add the EDGE to the Minimum Spanning Tree
-            vert_set.insert(child); // add the child node to the known set of vertices in the MST                                      
-            distance[child] = std::get<0>(my_min); // set the distance to node y to be the weight of node y in the distance array
+        Node_ID node = std::get<1>(my_min);
+        if(G.states[node] == NodeState::UNDISCOVERED){ // If the child node of the edge is UNDISCOVERED 
+            G.states[node] = NodeState::DISCOVERED; // set it to DISCOVERED
+            MST.push_back(std::pair(G.parents[node], node)); // Add the EDGE to the Minimum Spanning Tree
+            vert_set.insert(node); // add the child node to the known set of vertices in the MST                                      
             total_cost += std::get<0>(my_min); // update the total cost (it's an accumulating value)!
-            for(edgeNode* itr = G.getList()[child]; itr != nullptr; itr = itr->next){ // explore the neighbors of the child node
+            for(edgeNode* itr = G.getList()[node]; itr != nullptr; itr = itr->next){ // explore the neighbors of the child node
                 if(G.states[itr->y] == NodeState::UNDISCOVERED){ // If the neighbors are in an UNDISCOVERED state, add them to the heap
-                    min_cost_heap.push(heap_obj(itr->weight, child, itr->y));
+                    G.parents[itr->y] = node;
+                    min_cost_heap.push(heap_obj(itr->weight,itr->y));
                 }
             } // Loop over the heap!
         }
