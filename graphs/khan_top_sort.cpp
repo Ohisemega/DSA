@@ -4,9 +4,11 @@
  * For Directed Graphs
  */
 
-void top_sort(Graph& G, std::vector<int>& res){
+std::vector<int> top_sort(Graph& G){
     std::array<int, MAX+1> in_degrees;
     in_degrees.fill(0);
+    std::vector<int> res;
+    res.reserve(MAX);
 
     for(int i = 0; i < MAX+1; ++i){
         edgeNode* itr = G.getList()[i];
@@ -31,5 +33,7 @@ void top_sort(Graph& G, std::vector<int>& res){
             itr = itr->next;
         }
     }
-    if(res.size() < MAX) res.clear(); 
+    if(res.size() < G.vertices()) res.clear(); // there is NO topological sort for the graph in this case
+                                      // else we return our topologically sorted vector list
+    return res;
 }
