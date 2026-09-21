@@ -144,7 +144,7 @@ std::optional<data_t&> Heap<data_t>::getElement(int64_t idx) noexcept {
 
 template <typename type_t>
 int64_t Heap<type_t>::findMaxIndex(int64_t parentIndx) const noexcept {
-    if(parentIndx > (heapSize >> 1)) return {array[parentIndx-1], parentIndx};
+    if(parentIndx > (heapSize >> 1)) return parentIndx;
     
     int64_t indxArr[SUB_TREE_SIZE] = {parentIndx, LeftChild(parentIndx).value_or(parentIndx), RightChild(parentIndx).value_or(parentIndx)};
     type_t values[SUB_TREE_SIZE] = {array[parentIndx-1], array[indxArr[1]-1], array[indxArr[2]-1]};
@@ -164,7 +164,7 @@ int64_t Heap<type_t>::findMaxIndex(int64_t parentIndx) const noexcept {
 
 template <typename type_t>
 int64_t Heap<type_t>::findMinIndex(int64_t parentIndx) const noexcept {
-    if(parentIndx > (heapSize >> 1)) return {array[parentIndx-1], parentIndx};
+    if(parentIndx > (heapSize >> 1)) parentIndx;
     int64_t indxArr[SUB_TREE_SIZE] = {parentIndx, LeftChild(parentIndx).value_or(parentIndx), RightChild(parentIndx).value_or(parentIndx)};
     type_t values[SUB_TREE_SIZE] = {array[parentIndx-1], array[indxArr[1]-1], array[indxArr[2]-1]};
     type_t minKey;
@@ -230,7 +230,7 @@ void Heap<data_t>::MinHeapify(int64_t i) noexcept {
         auto minElemIdx = findMinIndex(i);
         if (minElemIdx != i) {
             std::swap(array[minElemIdx-1], array[i-1]);
-            MinHeapify(std::get<int64_t>(minElemIdx));
+            MinHeapify(minElemIdx);
         }
     }
 }
