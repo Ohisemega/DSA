@@ -6,7 +6,7 @@
 #include <optional>
 // #include <variant>
 #include <iostream>
-enum class HeapType{
+enum class HeapType {
     MAX_HEAP,
     MIN_HEAP,
 };
@@ -17,15 +17,15 @@ enum class HeapType{
     given as: 0, 1, 2, 3 --> 1, 2, 3, 4*/
 
 template <typename type_t>
-class Heap{
+class Heap {
     private:
         #define SUB_TREE_SIZE 3
         std::vector<type_t> array;
         int64_t heapSize;
         HeapType type;
 
-        std::pair<type_t, int64_t> findMaxIndex(int64_t parentIndx) const noexcept;
-        std::pair<type_t, int64_t> findMinIndex(int64_t parentIndx) const noexcept;
+        int64_t findMaxIndex(int64_t parentIndx) const noexcept;
+        int64_t findMinIndex(int64_t parentIndx) const noexcept;
 
     protected:
     // helper functions
@@ -39,7 +39,7 @@ class Heap{
         constexpr HeapType getHeapType()const noexcept;
         std::optional<type_t> getElement(int64_t) const noexcept;
         std::optional<type_t&> getElement(int64_t) noexcept;
-        void BuildHeap();
+        void BuildHeap() noexcept;
         bool changeElement(type_t data, type_t new_data) const noexcept;
 
     public:
@@ -51,11 +51,11 @@ class Heap{
         Heap(Heap<type_t>&&)noexcept; // move constructor
         Heap<type_t>& operator=(Heap<type_t>&&) noexcept; // move assignment operator
         virtual ~Heap();
-        void configureHeapType(HeapType type);
-        void MaxHeapSort();
-        void MinHeapSort();
+        void configureHeapType(HeapType type) noexcept;
+        void MaxHeapSort() noexcept;
+        void MinHeapSort() noexcept;
         void InsertHeap(type_t insetElement);
-        void HeapDeleteElement(int64_t i);
+        void HeapDeleteElement(int64_t i) noexcept;
         void printHeap() const;
 };
 
@@ -121,7 +121,7 @@ constexpr HeapType Heap<data_t>::getHeapType()const noexcept{
 }
 
 template <typename data_t>
-void Heap<data_t>::configureHeapType(HeapType type){
+void Heap<data_t>::configureHeapType(HeapType type) noexcept {
     if(this->type == type) return;
     this->type = type;
     this->BuildHeap();
@@ -143,7 +143,7 @@ std::optional<data_t&> Heap<data_t>::getElement(int64_t idx) noexcept {
 
 
 template <typename type_t>
-std::pair<type_t, int64_t> Heap<type_t>::findMaxIndex(int64_t parentIndx) const noexcept {
+int64_t Heap<type_t>::findMaxIndex(int64_t parentIndx) const noexcept {
     if(parentIndx > (heapSize >> 1)) return {array[parentIndx-1], parentIndx};
     
     int64_t indxArr[SUB_TREE_SIZE] = {parentIndx, LeftChild(parentIndx).value_or(parentIndx), RightChild(parentIndx).value_or(parentIndx)};
@@ -159,11 +159,11 @@ std::pair<type_t, int64_t> Heap<type_t>::findMaxIndex(int64_t parentIndx) const 
             max_i = indxArr[i];
         }
     }
-    return {maxKey, max_i};
+    return max_i;
 }
 
 template <typename type_t>
-std::pair<type_t, int64_t> Heap<type_t>::findMinIndex(int64_t parentIndx) const noexcept {
+int64_t Heap<type_t>::findMinIndex(int64_t parentIndx) const noexcept {
     if(parentIndx > (heapSize >> 1)) return {array[parentIndx-1], parentIndx};
     int64_t indxArr[SUB_TREE_SIZE] = {parentIndx, LeftChild(parentIndx).value_or(parentIndx), RightChild(parentIndx).value_or(parentIndx)};
     type_t values[SUB_TREE_SIZE] = {array[parentIndx-1], array[indxArr[1]-1], array[indxArr[2]-1]};
@@ -178,7 +178,7 @@ std::pair<type_t, int64_t> Heap<type_t>::findMinIndex(int64_t parentIndx) const 
             min_i = indxArr[i];
         }
     }
-    return {minKey, min_i};
+    return min_i;
 }
 
 template <typename data_t>
@@ -191,7 +191,7 @@ std::optional<int64_t> Heap<data_t>::Parent(int64_t i) const noexcept {
 
 template <typename data_t>
 std::optional<int64_t> Heap<data_t>::LeftChild(int64_t i) const noexcept {
-    if((i > 0) & (i < ((this->heapSize >> 1) + 1)) & ((2*i) <= this->heapSize)) {
+    if ((i > 0) & (i < ((this->heapSize >> 1) + 1)) & ((2*i) <= this->heapSize)) {
         return 2*i;     
     }
     return {};
@@ -212,10 +212,10 @@ void Heap<data_t>::MaxHeapify(int64_t i) noexcept {
     // array[i] holds that same property with respect to it's left and right children, but 
     // that check may invalidate one sub-tree, hence we recursively call it.
     if ((i > 0) & (i <= (this->heapSize >> 1))) {
-        std::pair<data_t, int64_t> maxElem = findMaxIndex(i);
-        if (maxElem.second != i) {
-            std::swap(array[maxElem.second-1], array[i-1]);
-            MaxHeapify(maxElem.second);
+        auto maxElemIdx = findMaxIndex(i);
+        if (maxElemIdx != i) {
+            std::swap(array[maxElemIdx-1], array[i-1]);
+            MaxHeapify(maxElemIdx);
         }
     }
 }
@@ -226,18 +226,18 @@ void Heap<data_t>::MinHeapify(int64_t i) noexcept {
     // min-heaps or hold the min-heap property. Now it must verify that 
     // array[i-1] holds that same property with respect to it's left and right children, but 
     // that check may invalidate one sub-tree, hence we recursively call it.
-    if((i > 0) & (i <= (this->heapSize >> 1))) {
-        std::pair<data_t, int64_t> minElem = findMinIndex(i);
-        if(minElem.second != i){
-            std::swap(array[minElem.second-1], array[i-1]);
-            MinHeapify(std::get<int64_t>(minElem));
+    if ((i > 0) & (i <= (this->heapSize >> 1))) {
+        auto minElemIdx = findMinIndex(i);
+        if (minElemIdx != i) {
+            std::swap(array[minElemIdx-1], array[i-1]);
+            MinHeapify(std::get<int64_t>(minElemIdx));
         }
     }
 }
 
 template <typename data_t>
-void Heap<data_t>::BuildHeap() {
-    if(this->type == HeapType::MAX_HEAP) {
+void Heap<data_t>::BuildHeap() noexcept {
+    if (this->type == HeapType::MAX_HEAP) {
         for (size_t i = this->heapSize >> 1; i > 0; --i) {
             MaxHeapify(i);
         }
@@ -268,7 +268,7 @@ void Heap<data_t>::InsertHeap(data_t insertElement) {
 
 // heap-sort is about sorting the internal array, not the heap itself
 template<typename data_t>
-void Heap<data_t>::MaxHeapSort() {
+void Heap<data_t>::MaxHeapSort() noexcept {
     for (;this->heapSize > 0;) {
         std::swap(array[0], array[heapSize-1]);
         --this->heapSize;
@@ -278,7 +278,7 @@ void Heap<data_t>::MaxHeapSort() {
 
 // heap-sort is about sorting the internal array, not the heap itself
 template<typename data_t>
-void Heap<data_t>::MinHeapSort() {
+void Heap<data_t>::MinHeapSort() noexcept {
     for (;this->heapSize > 1; --this->heapSize) {
         std::swap(array[0], array[heapSize-1]); 
         --this->heapSize;
@@ -287,7 +287,7 @@ void Heap<data_t>::MinHeapSort() {
 }
 
 template<typename data_t>
-void Heap<data_t>::HeapDeleteElement(int64_t i) {
+void Heap<data_t>::HeapDeleteElement(int64_t i) noexcept {
     if ((i > 0) & (i <= this->heapSize)) {
         std::swap(array[i-1], array[heapSize-1]);
         --this->heapSize;
